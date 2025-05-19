@@ -2,7 +2,19 @@
   "version": 2,
   "builds": [
     {
-      "src": "public/**",
+      "src": "*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "css/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "js/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "assets/*",
       "use": "@vercel/static"
     },
     {
@@ -26,6 +38,10 @@
     {
       "src": "/case.html",
       "dest": "/case.html"
+    },
+    {
+      "src": "/",
+      "dest": "/index.html"
     },
     {
       "src": "/(.*)",
