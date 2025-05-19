@@ -385,7 +385,7 @@ async function spinBonusRoulette() {
     
     const spinBtn = document.getElementById('spin-roulette-btn');
     spinBtn.disabled = true;
-    spinBtn.textContent = 'Крутим...';
+    spinBtn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Крутим...';
     
     const roulette = document.querySelector('.roulette-wheel');
     const items = document.querySelectorAll('.roulette-item');
@@ -400,10 +400,11 @@ async function spinBonusRoulette() {
     const extraRotations = 3;
     const totalOffset = offset - (extraRotations * 6 * itemWidth);
     
-    // Анимация вращения
+    // Сбрасываем анимацию
     roulette.style.transition = 'none';
     roulette.style.transform = `translateX(${-extraRotations * 6 * itemWidth}px)`;
     
+    // Даем браузеру время применить сброс
     setTimeout(() => {
         roulette.style.transition = 'transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
         roulette.style.transform = `translateX(${offset}px)`;
@@ -421,14 +422,16 @@ async function spinBonusRoulette() {
         switch (prizeType) {
             case 'balance':
                 const amount = parseInt(prizeValue);
-                await supabase
+                const { error: balanceError } = await supabase
                     .from('users')
                     .update({ balance: userBalance + amount })
                     .eq('id', currentUser.id);
                 
-                userBalance += amount;
-                document.getElementById('user-balance').textContent = userBalance;
-                message = `🎉 Вы выиграли ${amount} монет!`;
+                if (!balanceError) {
+                    userBalance += amount;
+                    document.getElementById('user-balance').textContent = userBalance;
+                    message = `🎉 Вы выиграли ${amount} монет!`;
+                }
                 break;
                 
             case 'discount':
@@ -447,18 +450,17 @@ async function spinBonusRoulette() {
                     .limit(1);
                 
                 if (randomItem && randomItem.length > 0) {
-                    const { error } = await supabase
+                    const { error: inventoryError } = await supabase
                         .from('inventory')
                         .insert([{
                             user_id: currentUser.id,
                             item_id: randomItem[0].id,
-                            quantity: 1,
                             obtained_at: new Date().toISOString()
                         }]);
                     
-                    if (!error) {
+                    if (!inventoryError) {
                         message = `🎁 Вы получили ${getRarityName(itemRarity)} предмет: ${randomItem[0].name}!`;
-                        loadInventory();
+                        await loadInventory();
                     }
                 }
                 break;
@@ -475,7 +477,7 @@ async function spinBonusRoulette() {
             }]);
         
         spinBtn.disabled = false;
-        spinBtn.textContent = 'Крутить рулетку';
+        spinBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Крутить рулетку';
         showNotification(message);
     }, 3100);
 }
@@ -613,9 +615,16 @@ async function initCases() {
         .select('*')
         .order('price', { ascending: true });
     
-    if (cases) {
+    if (error) {
+        console.error('Error loading cases:', error);
+        return;
+    }
+    
+    if (cases && cases.length > 0) {
         renderCases(cases);
         initCaseFilters();
+    } else {
+        console.log('No cases found in database');
     }
 }
 

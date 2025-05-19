@@ -1191,14 +1191,34 @@ body {
     opacity: 0.7;
 }
 
-/* Стили для рулетки бонусов */
+/* Стили для заголовка секции */
+.section-title {
+    padding: 15px;
+    background-color: var(--dark-color);
+    margin-bottom: 10px;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.section-title h2 {
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+}
+
+.section-title h2 i {
+    margin-right: 10px;
+    color: var(--accent-color);
+}
+
+/* Обновленные стили для рулетки */
 .roulette-container {
     position: relative;
-    height: 120px;
+    height: 150px;
     margin: 20px 0;
     overflow: hidden;
-    border-radius: 10px;
-    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.2), rgba(253, 121, 168, 0.2));
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .roulette-wheel {
@@ -1209,29 +1229,49 @@ body {
 }
 
 .roulette-item {
-    min-width: 100px;
+    min-width: 120px;
     height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 10px;
-    background-color: var(--dark-color);
+    padding: 15px;
+    background-color: rgba(45, 52, 54, 0.8);
     border-right: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
 }
 
-.roulette-item i {
+.roulette-item::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    right: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.3), transparent);
+}
+
+.roulette-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
     font-size: 1.5rem;
-    margin-bottom: 8px;
-    color: var(--accent-color);
+    color: white;
 }
 
-.roulette-item span {
-    font-size: 0.8rem;
+.roulette-value {
+    font-size: 0.9rem;
+    font-weight: 500;
     text-align: center;
 }
 
-.roulette-center {
+.roulette-pointer {
+    display: none; /* Добавьте эту строку */
     position: absolute;
     top: 50%;
     left: 50%;
@@ -1242,19 +1282,38 @@ body {
     background-color: var(--accent-color);
     z-index: 2;
     pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 4px var(--darker-color);
 }
 
-.roulette-center::before {
+.roulette-pointer::before {
     content: '';
     position: absolute;
-    top: -10px;
+    top: -15px;
     left: 50%;
     transform: translateX(-50%);
     width: 0;
     height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 15px solid var(--accent-color);
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-bottom: 20px solid var(--accent-color);
+}
+
+.roulette-info {
+    text-align: center;
+    font-size: 0.85rem;
+    opacity: 0.8;
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.roulette-info i {
+    margin-right: 8px;
+    color: var(--accent-color);
 }
 
 .spin-roulette-btn {
@@ -1266,25 +1325,22 @@ body {
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .spin-roulette-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .spin-roulette-btn:disabled {
     background: var(--dark-color);
     cursor: not-allowed;
     opacity: 0.7;
-}
-
-.roulette-info {
-    text-align: center;
-    font-size: 0.8rem;
-    opacity: 0.7;
-    margin-top: 10px;
 }
 
 /* Стили для информации о рефералах */
