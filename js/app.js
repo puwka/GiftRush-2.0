@@ -29,6 +29,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Загрузка инвентаря
         loadInventory();
+
+        await initCases();
     }
     
     // Инициализация вкладок
@@ -120,6 +122,74 @@ async function loadUserBalance() {
     }
 }
 
+function renderCases(cases, filter = 'all') {
+    const container = document.querySelector('.cases-container');
+    container.innerHTML = '';
+    
+    const filteredCases = filter === 'all' 
+        ? cases 
+        : cases.filter(c => c.rarity === filter);
+    
+    filteredCases.forEach(caseItem => {
+        const caseElement = document.createElement('div');
+        caseElement.className = 'case-card';
+        caseElement.setAttribute('data-case-id', caseItem.id);
+        caseElement.setAttribute('data-rarity', caseItem.rarity);
+        
+        caseElement.innerHTML = `
+            <div class="case-image" style="background-image: url('${caseItem.image_url}')">
+                <div class="case-rarity ${caseItem.rarity}">
+                    ${getRarityName(caseItem.rarity)}
+                </div>
+            </div>
+            <div class="case-info">
+                <h3>${caseItem.name}</h3>
+                <div class="case-price">
+                    <span class="case-price-value">
+                        ${caseItem.price} <i class="fas fa-coins"></i>
+                    </span>
+                    <span class="case-items-count">
+                        ${getRandomItemsCount()} items
+                    </span>
+                </div>
+            </div>
+        `;
+        
+        caseElement.addEventListener('click', () => {
+            openCasePage(caseItem.id);
+        });
+        
+        container.appendChild(caseElement);
+    });
+}
+
+function initCaseFilters() {
+    const filterButtons = document.querySelectorAll('.case-filters .filter-btn');
+    
+    filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Удаляем активный класс у всех кнопок
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Добавляем активный класс текущей кнопке
+            button.classList.add('active');
+            
+            // Получаем фильтр
+            const filter = button.getAttribute('data-filter');
+            
+            // Перерисовываем кейсы
+            const allCases = Array.from(document.querySelectorAll('.case-card'))
+                .map(el => ({
+                    id: el.getAttribute('data-case-id'),
+                    rarity: el.getAttribute('data-rarity'),
+                    // Другие данные можно получить из data-атрибутов или перезапросить
+                }));
+            
+            renderCases(allCases, filter);
+        });
+    });
+}
+
 // Функция для загрузки инвентаря
 async function loadInventory() {
     if (!currentUser) return;
@@ -165,14 +235,19 @@ function renderInventoryItems(filter = 'all') {
     });
 }
 
-// Функция для получения названия редкости
+function getRandomItemsCount() {
+    const counts = [12, 15, 20, 24, 30];
+    return counts[Math.floor(Math.random() * counts.length)];
+}
+
+// Обновим функцию getRarityName (добавим сокращенные варианты)
 function getRarityName(rarity) {
     const rarities = {
-        'common': 'Обычный',
-        'uncommon': 'Необычный',
-        'rare': 'Редкий',
-        'epic': 'Эпический',
-        'legendary': 'Легендарный'
+        'common': 'Common',
+        'uncommon': 'Uncommon',
+        'rare': 'Rare',
+        'epic': 'Epic',
+        'legendary': 'Legendary'
     };
     return rarities[rarity] || rarity;
 }
@@ -512,15 +587,17 @@ async function claimDailyBonus() {
 }
 
 // Функция для инициализации кейсов
-function initCases() {
-    const caseCards = document.querySelectorAll('.case-card');
+async function initCases() {
+    // Загружаем кейсы из Supabase
+    const { data: cases, error } = await supabase
+        .from('cases')
+        .select('*')
+        .order('price', { ascending: true });
     
-    caseCards.forEach(card => {
-        card.addEventListener('click', () => {
-            const caseId = card.getAttribute('data-case-id');
-            openCasePage(caseId);
-        });
-    });
+    if (cases) {
+        renderCases(cases);
+        initCaseFilters();
+    }
 }
 
 // Функция для открытия страницы с кейсом

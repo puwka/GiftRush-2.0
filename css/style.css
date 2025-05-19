@@ -1064,3 +1064,129 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* В style.css */
+
+/* Фильтры кейсов */
+.case-filters {
+    display: flex;
+    overflow-x: auto;
+    gap: 8px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    scrollbar-width: none; /* Для Firefox */
+}
+
+.case-filters::-webkit-scrollbar {
+    display: none; /* Для Chrome/Safari */
+}
+
+.filter-btn {
+    background-color: rgba(108, 92, 231, 0.1);
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.filter-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Контейнер кейсов */
+.cases-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 0 12px;
+}
+
+/* Карточка кейса */
+.case-card {
+    background-color: var(--dark-color);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    position: relative;
+}
+
+.case-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.case-image {
+    height: 140px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.case-rarity {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.case-rarity.common {
+    background-color: var(--rarity-common);
+}
+.case-rarity.uncommon {
+    background-color: var(--rarity-uncommon);
+}
+.case-rarity.rare {
+    background-color: var(--rarity-rare);
+}
+.case-rarity.epic {
+    background-color: var(--rarity-epic);
+}
+.case-rarity.legendary {
+    background-color: var(--rarity-legendary);
+}
+
+.case-info {
+    padding: 12px;
+}
+
+.case-info h3 {
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.case-price {
+    color: var(--warning-color);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.case-price-value {
+    display: flex;
+    align-items: center;
+}
+
+.case-price i {
+    margin-left: 5px;
+}
+
+.case-items-count {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
