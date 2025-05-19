@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Открытие кейса - GiftRush</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div class="case-open-container">
+        <header class="case-header">
+            <h1>Открытие кейса</h1>
+            <button class="back-to-main" id="back-to-main-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        </header>
+
+        <main class="case-main">
+            <div class="case-preview">
+                <img src="assets/case1.png" alt="Кейс" id="case-preview-image">
+                <h2 id="case-preview-name">Обычный кейс</h2>
+                <p id="case-preview-price">Стоимость: 100 <i class="fas fa-coins"></i></p>
+            </div>
+
+            <div class="roulette-container">
+                <div class="roulette-items" id="roulette-items">
+                    <!-- Здесь будут элементы рулетки -->
+                </div>
+            </div>
+
+            <button class="open-case-btn" id="open-case-btn">Открыть за 100 <i class="fas fa-coins"></i></button>
+        </main>
+
+        <div class="case-result" id="case-result">
+            <div class="result-content">
+                <h2>Поздравляем!</h2>
+                <div class="won-item">
+                    <img src="assets/item1.png" alt="Выигранный предмет" id="won-item-image">
+                    <h3 id="won-item-name">Название предмета</h3>
+                    <p id="won-item-rarity">Редкость: <span>Обычный</span></p>
+                    <p id="won-item-price">Цена: <span>50</span> <i class="fas fa-coins"></i></p>
+                </div>
+                <div class="result-actions">
+                    <button class="to-inventory-btn" id="to-inventory-btn">В инвентарь</button>
+                    <button class="open-another-btn" id="open-another-btn">Открыть еще</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/supabase.js"></script>
+    <script type="module" src="js/case.js"></script>
+</body>
+</html>
