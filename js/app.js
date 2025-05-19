@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Загрузка инвентаря
         loadInventory();
 
+        // Инициализация кейсов
         await initCases();
     }
     
@@ -41,9 +42,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Инициализация кнопок
     initButtons();
-    
-    // Инициализация кейсов
-    initCases();
 });
 
 // Функция для получения или создания пользователя
@@ -69,7 +67,7 @@ async function getUserOrCreate(tgUser) {
             last_name: tgUser.last_name,
             language_code: tgUser.language_code,
             is_premium: tgUser.is_premium || false,
-            balance: 0,
+            balance: 100, // Начальный баланс
             level: 1,
             experience: 0,
             referrals_count: 0,
@@ -104,6 +102,10 @@ function updateUserUI(user) {
     
     // Обновление реферальной ссылки
     document.getElementById('referral-link').value = `https://t.me/YOUR_BOT_USERNAME?start=ref_${user.referral_code}`;
+    
+    // Обновление статистики
+    document.getElementById('ref-count').textContent = user.referrals_count || 0;
+    document.getElementById('ref-earned').textContent = (user.referrals_count * 50) || 0; // 50 USDT за каждого реферала
 }
 
 // Функция для загрузки баланса пользователя
@@ -120,74 +122,6 @@ async function loadUserBalance() {
         userBalance = data.balance;
         document.getElementById('user-balance').textContent = userBalance;
     }
-}
-
-function renderCases(cases, filter = 'all') {
-    const container = document.querySelector('.cases-container');
-    container.innerHTML = '';
-    
-    const filteredCases = filter === 'all' 
-        ? cases 
-        : cases.filter(c => c.rarity === filter);
-    
-    filteredCases.forEach(caseItem => {
-        const caseElement = document.createElement('div');
-        caseElement.className = 'case-card';
-        caseElement.setAttribute('data-case-id', caseItem.id);
-        caseElement.setAttribute('data-rarity', caseItem.rarity);
-        
-        caseElement.innerHTML = `
-            <div class="case-image" style="background-image: url('${caseItem.image_url}')">
-                <div class="case-rarity ${caseItem.rarity}">
-                    ${getRarityName(caseItem.rarity)}
-                </div>
-            </div>
-            <div class="case-info">
-                <h3>${caseItem.name}</h3>
-                <div class="case-price">
-                    <span class="case-price-value">
-                        ${caseItem.price} <i class="fas fa-coins"></i>
-                    </span>
-                    <span class="case-items-count">
-                        ${getRandomItemsCount()} items
-                    </span>
-                </div>
-            </div>
-        `;
-        
-        caseElement.addEventListener('click', () => {
-            openCasePage(caseItem.id);
-        });
-        
-        container.appendChild(caseElement);
-    });
-}
-
-function initCaseFilters() {
-    const filterButtons = document.querySelectorAll('.case-filters .filter-btn');
-    
-    filterButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            // Удаляем активный класс у всех кнопок
-            filterButtons.forEach(btn => btn.classList.remove('active'));
-            
-            // Добавляем активный класс текущей кнопке
-            button.classList.add('active');
-            
-            // Получаем фильтр
-            const filter = button.getAttribute('data-filter');
-            
-            // Перерисовываем кейсы
-            const allCases = Array.from(document.querySelectorAll('.case-card'))
-                .map(el => ({
-                    id: el.getAttribute('data-case-id'),
-                    rarity: el.getAttribute('data-rarity'),
-                    // Другие данные можно получить из data-атрибутов или перезапросить
-                }));
-            
-            renderCases(allCases, filter);
-        });
-    });
 }
 
 // Функция для загрузки инвентаря
@@ -235,19 +169,14 @@ function renderInventoryItems(filter = 'all') {
     });
 }
 
-function getRandomItemsCount() {
-    const counts = [12, 15, 20, 24, 30];
-    return counts[Math.floor(Math.random() * counts.length)];
-}
-
-// Обновим функцию getRarityName (добавим сокращенные варианты)
+// Функция для получения названия редкости
 function getRarityName(rarity) {
     const rarities = {
-        'common': 'Common',
-        'uncommon': 'Uncommon',
-        'rare': 'Rare',
-        'epic': 'Epic',
-        'legendary': 'Legendary'
+        'common': 'Обычный',
+        'uncommon': 'Необычный',
+        'rare': 'Редкий',
+        'epic': 'Эпический',
+        'legendary': 'Легендарный'
     };
     return rarities[rarity] || rarity;
 }
@@ -313,8 +242,34 @@ async function sellItem(item) {
 
 // Функция для вывода предмета
 async function withdrawItem(item) {
-    // Здесь должна быть логика вывода предмета (например, через Telegram бота)
-    showNotification('Функция вывода предмета в разработке');
+    // Проверяем, можно ли вывести предмет
+    if (!item.items.withdrawable) {
+        showNotification('Этот предмет нельзя вывести');
+        return;
+    }
+    
+    // Здесь должна быть логика вывода через Telegram бота
+    showNotification(`Запрос на вывод ${item.items.name} отправлен. Мы свяжемся с вами для уточнения деталей.`);
+    
+    // Можно добавить запись в таблицу выводов
+    const { error } = await supabase
+        .from('withdrawals')
+        .insert([{
+            user_id: currentUser.id,
+            item_id: item.item_id,
+            status: 'pending',
+            created_at: new Date().toISOString()
+        }]);
+    
+    if (!error) {
+        // Удаляем предмет из инвентаря после запроса на вывод
+        await supabase
+            .from('inventory')
+            .delete()
+            .eq('id', item.id);
+        
+        loadInventory();
+    }
 }
 
 // Функция для инициализации вкладок
@@ -405,10 +360,124 @@ function initButtons() {
         createPromoCode();
     });
     
-    // Кнопка получения бонуса
-    document.getElementById('claim-bonus-btn').addEventListener('click', () => {
-        claimDailyBonus();
-    });
+    // Кнопка вращения рулетки бонусов
+    document.getElementById('spin-roulette-btn').addEventListener('click', spinBonusRoulette);
+}
+
+// Функция для вращения рулетки бонусов
+async function spinBonusRoulette() {
+    if (!currentUser) return;
+    
+    // Проверяем, получал ли пользователь бонус сегодня
+    const today = new Date().toISOString().split('T')[0];
+    const { data: lastBonus, error } = await supabase
+        .from('daily_bonuses')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .order('claimed_at', { ascending: false })
+        .limit(1)
+        .single();
+    
+    if (lastBonus && lastBonus.claimed_at.split('T')[0] === today) {
+        showNotification('Вы уже получали бонус сегодня. Приходите завтра!');
+        return;
+    }
+    
+    const spinBtn = document.getElementById('spin-roulette-btn');
+    spinBtn.disabled = true;
+    spinBtn.textContent = 'Крутим...';
+    
+    const roulette = document.querySelector('.roulette-wheel');
+    const items = document.querySelectorAll('.roulette-item');
+    const itemWidth = items[0].offsetWidth;
+    
+    // Определяем случайный приз (индекс от 0 до 5)
+    const prizeIndex = Math.floor(Math.random() * 6);
+    // Смещение, чтобы выбранный элемент оказался в центре
+    const offset = - (prizeIndex * itemWidth) + (roulette.offsetWidth / 2 - itemWidth / 2);
+    
+    // Добавляем дополнительные обороты для эффекта
+    const extraRotations = 3;
+    const totalOffset = offset - (extraRotations * 6 * itemWidth);
+    
+    // Анимация вращения
+    roulette.style.transition = 'none';
+    roulette.style.transform = `translateX(${-extraRotations * 6 * itemWidth}px)`;
+    
+    setTimeout(() => {
+        roulette.style.transition = 'transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
+        roulette.style.transform = `translateX(${offset}px)`;
+    }, 10);
+    
+    // После завершения анимации
+    setTimeout(async () => {
+        const prize = items[prizeIndex];
+        const prizeType = prize.getAttribute('data-type');
+        const prizeValue = prize.getAttribute('data-value');
+        
+        let message = '';
+        
+        // Обрабатываем выигрыш
+        switch (prizeType) {
+            case 'balance':
+                const amount = parseInt(prizeValue);
+                await supabase
+                    .from('users')
+                    .update({ balance: userBalance + amount })
+                    .eq('id', currentUser.id);
+                
+                userBalance += amount;
+                document.getElementById('user-balance').textContent = userBalance;
+                message = `🎉 Вы выиграли ${amount} монет!`;
+                break;
+                
+            case 'discount':
+                // Сохраняем скидку для следующего кейса
+                localStorage.setItem('activeDiscount', prizeValue);
+                message = `🎁 Вы получили скидку ${prizeValue}% на следующий кейс!`;
+                break;
+                
+            case 'item':
+                // Добавляем предмет в инвентарь
+                const itemRarity = prizeValue;
+                const { data: randomItem, error: itemError } = await supabase
+                    .from('items')
+                    .select('*')
+                    .eq('rarity', itemRarity)
+                    .limit(1);
+                
+                if (randomItem && randomItem.length > 0) {
+                    const { error } = await supabase
+                        .from('inventory')
+                        .insert([{
+                            user_id: currentUser.id,
+                            item_id: randomItem[0].id,
+                            quantity: 1,
+                            obtained_at: new Date().toISOString()
+                        }]);
+                    
+                    if (!error) {
+                        message = `🎁 Вы получили ${getRarityName(itemRarity)} предмет: ${randomItem[0].name}!`;
+                        loadInventory();
+                    }
+                }
+                break;
+        }
+        
+        // Записываем получение бонуса
+        await supabase
+            .from('daily_bonuses')
+            .insert([{
+                user_id: currentUser.id,
+                type: prizeType,
+                value: prizeValue,
+                claimed_at: new Date().toISOString()
+            }]);
+        
+        spinBtn.disabled = false;
+        spinBtn.textContent = 'Крутить рулетку';
+        showNotification(message);
+    }, 3100);
 }
 
 // Функция для обработки пополнения баланса
@@ -431,7 +500,7 @@ async function processDeposit(amount) {
     document.getElementById('user-balance').textContent = userBalance;
     document.getElementById('deposit-modal').classList.remove('active');
     
-    showNotification(`Баланс успешно пополнен на ${amount} монет`);
+    showNotification(`💰 Баланс успешно пополнен на ${amount} монет`);
 }
 
 // Функция для активации промокода
@@ -487,7 +556,7 @@ async function applyPromoCode(code) {
     document.getElementById('user-balance').textContent = userBalance;
     document.getElementById('promo-input').value = '';
     
-    showNotification(`Промокод активирован! Получено ${promo.reward_amount} монет`);
+    showNotification(`🎉 Промокод активирован! Получено ${promo.reward_amount} монет`);
 }
 
 // Функция для создания промокода
@@ -523,7 +592,7 @@ async function createPromoCode() {
         return;
     }
     
-    showNotification(`Ваш промокод создан: ${promoCode}\n\nНаграда: ${rewardAmount} монет\n\nПоделитесь им с друзьями!`);
+    showNotification(`🎁 Ваш промокод создан: ${promoCode}\n\nНаграда: ${rewardAmount} монет\n\nПоделитесь им с друзьями!`);
 }
 
 // Функция для генерации промокода
@@ -534,56 +603,6 @@ function generatePromoCode() {
         result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return result;
-}
-
-// Функция для получения ежедневного бонуса
-async function claimDailyBonus() {
-    if (!currentUser) return;
-    
-    // Проверяем, когда пользователь последний раз получал бонус
-    const today = new Date().toISOString().split('T')[0];
-    const { data: lastBonus, error } = await supabase
-        .from('daily_bonuses')
-        .select('*')
-        .eq('user_id', currentUser.id)
-        .order('claimed_at', { ascending: false })
-        .limit(1)
-        .single();
-    
-    if (lastBonus && lastBonus.claimed_at.split('T')[0] === today) {
-        showNotification('Вы уже получали бонус сегодня');
-        return;
-    }
-    
-    // Определяем размер бонуса (можно сделать прогрессию по дням)
-    const bonusAmount = 50; // Базовый бонус
-    
-    // Добавляем бонус на баланс
-    const { error: updateError } = await supabase
-        .from('users')
-        .update({ balance: userBalance + bonusAmount })
-        .eq('id', currentUser.id);
-    
-    if (updateError) {
-        console.error('Error updating balance:', updateError);
-        showNotification('Ошибка при получении бонуса');
-        return;
-    }
-    
-    // Записываем получение бонуса
-    await supabase
-        .from('daily_bonuses')
-        .insert([{
-            user_id: currentUser.id,
-            amount: bonusAmount,
-            claimed_at: new Date().toISOString()
-        }]);
-    
-    // Обновляем UI
-    userBalance += bonusAmount;
-    document.getElementById('user-balance').textContent = userBalance;
-    
-    showNotification(`Ежедневный бонус получен! +${bonusAmount} монет`);
 }
 
 // Функция для инициализации кейсов
@@ -600,8 +619,92 @@ async function initCases() {
     }
 }
 
+// Функция для отрисовки кейсов
+function renderCases(cases, filter = 'all') {
+    const container = document.querySelector('.cases-container');
+    container.innerHTML = '';
+    
+    const filteredCases = filter === 'all' 
+        ? cases 
+        : cases.filter(c => c.rarity === filter);
+    
+    filteredCases.forEach(caseItem => {
+        const caseElement = document.createElement('div');
+        caseElement.className = 'case-card';
+        caseElement.setAttribute('data-case-id', caseItem.id);
+        caseElement.setAttribute('data-rarity', caseItem.rarity);
+        
+        caseElement.innerHTML = `
+            <div class="case-image" style="background-image: url('${caseItem.image_url}')">
+                <div class="case-rarity ${caseItem.rarity}">
+                    ${getRarityName(caseItem.rarity)}
+                </div>
+            </div>
+            <div class="case-info">
+                <h3>${caseItem.name}</h3>
+                <div class="case-price">
+                    <span class="case-price-value">
+                        ${caseItem.price} <i class="fas fa-coins"></i>
+                    </span>
+                    <span class="case-items-count">
+                        ${getRandomItemsCount()} предметов
+                    </span>
+                </div>
+            </div>
+        `;
+        
+        caseElement.addEventListener('click', () => {
+            openCasePage(caseItem.id);
+        });
+        
+        container.appendChild(caseElement);
+    });
+}
+
+// Функция для инициализации фильтров кейсов
+function initCaseFilters() {
+    const filterButtons = document.querySelectorAll('.case-filters .filter-btn');
+    
+    filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Удаляем активный класс у всех кнопок
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Добавляем активный класс текущей кнопке
+            button.classList.add('active');
+            
+            // Получаем фильтр
+            const filter = button.getAttribute('data-filter');
+            
+            // Перерисовываем кейсы
+            const allCases = Array.from(document.querySelectorAll('.case-card'))
+                .map(el => ({
+                    id: el.getAttribute('data-case-id'),
+                    rarity: el.getAttribute('data-rarity'),
+                    name: el.querySelector('h3').textContent,
+                    price: parseInt(el.querySelector('.case-price-value').textContent),
+                    image_url: el.querySelector('.case-image').style.backgroundImage.slice(5, -2)
+                }));
+            
+            renderCases(allCases, filter);
+        });
+    });
+}
+
+// Функция для получения случайного количества предметов в кейсе
+function getRandomItemsCount() {
+    const counts = [12, 15, 20, 24, 30];
+    return counts[Math.floor(Math.random() * counts.length)];
+}
+
 // Функция для открытия страницы с кейсом
 function openCasePage(caseId) {
+    // Проверяем активную скидку
+    const discount = localStorage.getItem('activeDiscount');
+    if (discount) {
+        showNotification(`У вас активна скидка ${discount}% на этот кейс!`);
+    }
+    
     // Сохраняем ID кейса для использования на странице case.html
     localStorage.setItem('selectedCaseId', caseId);
     window.location.href = 'case.html';

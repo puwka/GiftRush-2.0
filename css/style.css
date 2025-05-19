@@ -1190,3 +1190,121 @@ body {
     font-size: 0.8rem;
     opacity: 0.7;
 }
+
+/* Стили для рулетки бонусов */
+.roulette-container {
+    position: relative;
+    height: 120px;
+    margin: 20px 0;
+    overflow: hidden;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.roulette-wheel {
+    display: flex;
+    height: 100%;
+    transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+    will-change: transform;
+}
+
+.roulette-item {
+    min-width: 100px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background-color: var(--dark-color);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.roulette-item i {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+    color: var(--accent-color);
+}
+
+.roulette-item span {
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.roulette-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: var(--accent-color);
+    z-index: 2;
+    pointer-events: none;
+}
+
+.roulette-center::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 15px solid var(--accent-color);
+}
+
+.spin-roulette-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent-color), #ff7675);
+    border: none;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.spin-roulette-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.spin-roulette-btn:disabled {
+    background: var(--dark-color);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.roulette-info {
+    text-align: center;
+    font-size: 0.8rem;
+    opacity: 0.7;
+    margin-top: 10px;
+}
+
+/* Стили для информации о рефералах */
+.referral-info {
+    display: flex;
+    align-items: center;
+    background-color: rgba(0, 184, 148, 0.1);
+    border: 1px solid var(--success-color);
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.referral-info i {
+    color: var(--success-color);
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+.referral-info p {
+    font-size: 0.8rem;
+    flex: 1;
+}

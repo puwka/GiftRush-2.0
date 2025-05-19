@@ -29,6 +29,7 @@
         <main class="app-main">
             <!-- Вкладка Кейсы -->
             <div class="tab-content active" id="cases-tab">
+                <!-- Фильтры кейсов -->
                 <div class="case-filters">
                     <button class="filter-btn active" data-filter="all">Все</button>
                     <button class="filter-btn" data-filter="common">Обычные</button>
@@ -72,19 +73,38 @@
             <!-- Вкладка Бонусы -->
             <div class="tab-content" id="bonuses-tab">
                 <div class="bonus-section">
-                    <h2><i class="fas fa-gift"></i> Ежедневный бонус</h2>
-                    <div class="daily-bonus-container">
-                        <div class="bonus-day active">
-                            <div class="day-number">День 1</div>
-                            <div class="bonus-amount">50 <i class="fas fa-coins"></i></div>
+                    <h2><i class="fas fa-gift"></i> Ежедневная рулетка</h2>
+                    <div class="roulette-container">
+                        <div class="roulette-wheel" id="bonus-roulette">
+                            <div class="roulette-item" data-type="balance" data-value="50">
+                                <i class="fas fa-coins"></i>
+                                <span>50 монет</span>
+                            </div>
+                            <div class="roulette-item" data-type="discount" data-value="10">
+                                <i class="fas fa-percentage"></i>
+                                <span>10% скидка</span>
+                            </div>
+                            <div class="roulette-item" data-type="item" data-value="common">
+                                <i class="fas fa-box-open"></i>
+                                <span>Обычный предмет</span>
+                            </div>
+                            <div class="roulette-item" data-type="balance" data-value="100">
+                                <i class="fas fa-coins"></i>
+                                <span>100 монет</span>
+                            </div>
+                            <div class="roulette-item" data-type="discount" data-value="20">
+                                <i class="fas fa-percentage"></i>
+                                <span>20% скидка</span>
+                            </div>
+                            <div class="roulette-item" data-type="item" data-value="rare">
+                                <i class="fas fa-box-open"></i>
+                                <span>Редкий предмет</span>
+                            </div>
                         </div>
-                        <div class="bonus-day">
-                            <div class="day-number">День 2</div>
-                            <div class="bonus-amount">75 <i class="fas fa-coins"></i></div>
-                        </div>
-                        <!-- Другие дни -->
+                        <div class="roulette-center"></div>
                     </div>
-                    <button class="claim-bonus-btn" id="claim-bonus-btn">Забрать бонус</button>
+                    <button class="spin-roulette-btn" id="spin-roulette-btn">Крутить рулетку</button>
+                    <p class="roulette-info">Крутите рулетку каждый день для получения бонусов!</p>
                 </div>
 
                 <div class="bonus-section">
@@ -100,6 +120,10 @@
                                 <div class="stat-value" id="ref-earned">0</div>
                                 <div class="stat-label">Заработано</div>
                             </div>
+                        </div>
+                        <div class="referral-info">
+                            <i class="fas fa-info-circle"></i>
+                            <p>Вы можете вывести от 50 USDT с каждого приглашенного друга после их первого пополнения</p>
                         </div>
                         <div class="referral-link-container">
                             <input type="text" id="referral-link" readonly value="https://t.me/your_bot?start=ref123">
