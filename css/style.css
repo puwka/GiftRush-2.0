@@ -1270,37 +1270,6 @@ body {
     text-align: center;
 }
 
-.roulette-pointer {
-    display: none; /* Добавьте эту строку */
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background-color: var(--accent-color);
-    z-index: 2;
-    pointer-events: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 0 4px var(--darker-color);
-}
-
-.roulette-pointer::before {
-    content: '';
-    position: absolute;
-    top: -15px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 12px solid transparent;
-    border-right: 12px solid transparent;
-    border-bottom: 20px solid var(--accent-color);
-}
-
 .roulette-info {
     text-align: center;
     font-size: 0.85rem;
@@ -1363,4 +1332,685 @@ body {
 .referral-info p {
     font-size: 0.8rem;
     flex: 1;
+}
+
+.roulette-container {
+    position: relative;
+    height: 150px;
+    margin: 20px 0;
+    overflow: hidden;
+    border-radius: 15px;
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.2), rgba(253, 121, 168, 0.2));
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.roulette-wheel {
+    display: flex;
+    height: 100%;
+    transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+}
+
+.roulette-item {
+    min-width: 120px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    background-color: rgba(45, 52, 54, 0.8);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+}
+
+.roulette-item::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    right: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.3), transparent);
+}
+
+.roulette-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.roulette-value {
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(253, 121, 168, 0.7); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(253, 121, 168, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(253, 121, 168, 0); }
+}
+
+.pulse {
+    animation: pulse 1s ease-out;
+    z-index: 1;
+    position: relative;
+}
+
+/* Стили для карточек бонусов */
+.bonus-card {
+    background: linear-gradient(135deg, rgba(45, 52, 54, 0.8), rgba(30, 39, 46, 0.9));
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(108, 92, 231, 0.3);
+}
+
+.bonus-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.bonus-header i {
+    font-size: 1.5rem;
+    color: var(--accent-color);
+    margin-right: 10px;
+}
+
+.bonus-header h2 {
+    font-size: 1.2rem;
+    color: white;
+}
+
+.bonus-description {
+    opacity: 0.9;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+}
+
+/* Стили для возможных призов */
+.possible-prizes {
+    margin: 20px 0;
+}
+
+.possible-prizes h3 {
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    color: var(--secondary-color);
+}
+
+.possible-prizes h3 i {
+    margin-left: 8px;
+    color: var(--accent-color);
+    cursor: pointer;
+}
+
+.prizes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.prize-item {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    padding: 10px;
+    position: relative;
+    transition: transform 0.2s;
+}
+
+.prize-item:hover {
+    transform: translateY(-3px);
+    background: rgba(108, 92, 231, 0.2);
+}
+
+.prize-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+    color: white;
+    font-size: 1.2rem;
+}
+
+.prize-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+}
+
+.info-icon {
+    color: var(--accent-color);
+    cursor: pointer;
+    font-size: 0.9rem;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.info-icon:hover {
+    opacity: 1;
+}
+
+/* Стили для статистики */
+.stats-container {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 0 10px;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+/* Стили для модального окна шансов */
+#chance-info-content {
+    padding: 10px;
+}
+
+.chance-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.chance-item:last-child {
+    border-bottom: none;
+}
+
+.bonus-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.bonus-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Добавьте это в конец файла style.css */
+
+/* Обновленные стили для рулетки */
+.roulette-container {
+    position: relative;
+    height: 180px;
+    margin: 25px 0;
+    overflow: hidden;
+    justify-content: center;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.15), rgba(253, 121, 168, 0.15));
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    padding: 10px 0;
+}
+
+.roulette-wheel {
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+    will-change: transform;
+}
+
+.roulette-item {
+    min-width: 150px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-color: rgba(45, 52, 54, 0.7);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    position: relative;
+    transition: all 0.3s;
+}
+
+.roulette-item:hover {
+    background-color: rgba(108, 92, 231, 0.2);
+}
+
+.roulette-item::after {
+    content: '';
+    position: absolute;
+    top: 15px;
+    bottom: 15px;
+    right: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.15), transparent);
+}
+
+/* Обновленные стили указателя */
+/* Обновленный указатель рулетки */
+.roulette-pointer {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 100%;
+    background: var(--primary-color); /* Изменен цвет полосы */
+    z-index: 20;
+}
+
+/* Верхняя стрелка (направлена вниз) */
+.roulette-pointer::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 20px solid var(--primary-color); /* Изменено направление */
+}
+
+/* Нижняя стрелка (направлена вверх) */
+.roulette-pointer::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-bottom: 20px solid var(--primary-color); /* Изменено направление */
+}
+
+.roulette-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+    color: white;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+    transition: transform 0.3s;
+}
+
+.roulette-value {
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    background: linear-gradient(135deg, #fff, #e0e0e0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Анимация для выигранного приза */
+@keyframes prizeGlow {
+    0% { box-shadow: 0 0 10px 0 rgba(253, 121, 168, 0.7); }
+    50% { box-shadow: 0 0 20px 10px rgba(253, 121, 168, 0.4); }
+    100% { box-shadow: 0 0 10px 0 rgba(253, 121, 168, 0.7); }
+}
+
+.prize-winner {
+    animation: prizeGlow 1.5s infinite, pulse 1.5s infinite;
+    position: relative;
+    z-index: 5;
+}
+
+.prize-winner::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border: 2px solid var(--accent-color);
+    border-radius: 5px;
+    animation: prizeGlow 1.5s infinite;
+    z-index: -1;
+}
+
+/* Обновленные стили для возможных призов */
+.possible-prizes {
+    margin: 30px 0 20px;
+    background: rgba(30, 39, 46, 0.6);
+    border-radius: 20px;
+    padding: 20px;
+    border: 1px solid rgba(108, 92, 231, 0.2);
+    backdrop-filter: blur(5px);
+}
+
+.possible-prizes h3 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    color: var(--secondary-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.possible-prizes h3 i {
+    margin-left: 10px;
+    color: var(--accent-color);
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.possible-prizes h3 i:hover {
+    transform: scale(1.1);
+}
+
+.prizes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 15px;
+}
+
+.prize-item {
+    background: linear-gradient(135deg, rgba(45, 52, 54, 0.8), rgba(30, 39, 46, 0.9));
+    border-radius: 15px;
+    padding: 15px 10px;
+    position: relative;
+    transition: all 0.3s;
+    border: 1px solid rgba(108, 92, 231, 0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    overflow: hidden;
+}
+
+.prize-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(108, 92, 231, 0.3);
+    border-color: var(--primary-color);
+}
+
+.prize-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+}
+
+.prize-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    color: white;
+    font-size: 1.4rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s;
+}
+
+.prize-item:hover .prize-icon {
+    transform: rotate(15deg) scale(1.1);
+}
+
+.prize-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    padding: 0 5px;
+}
+
+.prize-info span {
+    font-weight: 500;
+    color: white;
+}
+
+.info-icon {
+    color: var(--accent-color);
+    cursor: pointer;
+    font-size: 1rem;
+    opacity: 0.8;
+    transition: all 0.3s;
+}
+
+.info-icon:hover {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+.prize-chance {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(0, 0, 0, 0.5);
+    color: var(--warning-color);
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+/* Кнопка вращения рулетки */
+.spin-roulette-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent-color), #ff7675);
+    border: none;
+    color: white;
+    padding: 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 10px;
+    box-shadow: 0 4px 15px rgba(253, 121, 168, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+.spin-roulette-btn::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        to bottom right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0) 45%,
+        rgba(255, 255, 255, 0.2) 48%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0.2) 52%,
+        rgba(255, 255, 255, 0) 55%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(30deg);
+    animation: shine 3s infinite;
+}
+
+@keyframes shine {
+    0% { left: -50%; }
+    20% { left: 100%; }
+    100% { left: 100%; }
+}
+
+.spin-roulette-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(253, 121, 168, 0.6);
+}
+
+.spin-roulette-btn:disabled {
+    background: var(--dark-color);
+    color: rgba(255, 255, 255, 0.5);
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.spin-roulette-btn:disabled::before {
+    display: none;
+}
+
+/* Информация о рулетке */
+.roulette-info {
+    text-align: center;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--secondary-color);
+}
+
+.roulette-info i {
+    margin-right: 10px;
+    color: var(--accent-color);
+    font-size: 1.2rem;
+}
+
+/* Адаптивность */
+@media (max-width: 500px) {
+    .roulette-item {
+        min-width: 130px;
+        padding: 15px 10px;
+    }
+    
+    .roulette-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+    
+    .roulette-value {
+        font-size: 0.9rem;
+    }
+    
+    .prizes-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 300px) {
+    .roulette-container {
+        height: 160px;
+    }
+    
+    .roulette-item {
+        min-width: 120px;
+    }
+    
+    .prizes-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Стили для модального окна создания промокода */
+#create-promo-modal .modal-content {
+    max-width: 350px;
+}
+
+/* В style.css */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.promo-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 2px solid var(--primary-color);
+    background-color: rgba(0, 0, 0, 0.3);
+    color: white;
+    font-size: 0.95rem;
+}
+
+.save-promo-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    background: var(--success-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.save-promo-btn:hover {
+    background: #00ce9d;
+    transform: translateY(-2px);
+}
+
+/* Стили для уведомления */
+.save-notification {
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--success-color);
+    color: white;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.save-notification.show {
+    opacity: 1;
+    visibility: visible;
+    top: 80px;
 }

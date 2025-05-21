@@ -362,28 +362,73 @@ function initButtons() {
     
     // Кнопка вращения рулетки бонусов
     document.getElementById('spin-roulette-btn').addEventListener('click', spinBonusRoulette);
+
+    // Добавьте в функцию initButtons()
+    document.querySelectorAll('.info-icon').forEach(icon => {
+        icon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const prizeItem = icon.closest('.prize-item');
+            const prizeName = prizeItem.querySelector('span').textContent;
+            const prizeChance = prizeItem.getAttribute('data-chance');
+            
+            document.getElementById('chance-info-content').innerHTML = `
+                <div class="chance-item">
+                    <span>${prizeName}</span>
+                    <span class="chance-value">${prizeChance}</span>
+                </div>
+                <!-- Добавьте другие призы аналогично -->
+            `;
+            
+            document.getElementById('chance-modal').classList.add('active');
+        });
+    });
+
+    // Добавьте закрытие модального окна
+    document.getElementById('close-chance-modal').addEventListener('click', () => {
+        document.getElementById('chance-modal').classList.remove('active');
+    });
+
+    // Инициализация модального окна создания промокода
+    document.getElementById('create-promo-btn').addEventListener('click', () => {
+        document.getElementById('create-promo-modal').classList.add('active');
+    });
+
+    document.getElementById('close-create-promo-modal').addEventListener('click', () => {
+        document.getElementById('create-promo-modal').classList.remove('active');
+    });
+
+    // Обработчик сохранения промокода
+    document.getElementById('save-promo-btn').addEventListener('click', () => {
+        const promoCode = document.getElementById('promo-code-input').value.trim();
+        
+        if(promoCode.length < 4) {
+            showNotification('Промокод должен содержать минимум 4 символа');
+            return;
+        }
+        
+        // Здесь должна быть логика сохранения промокода
+        console.log('Создан промокод:', promoCode);
+        
+        // Показываем уведомление
+        const notification = document.getElementById('save-notification');
+        notification.classList.add('show');
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 2000);
+        
+        // Закрываем модалку и очищаем поле
+        document.getElementById('create-promo-modal').classList.remove('active');
+        document.getElementById('promo-code-input').value = '';
+    });
 }
 
 // Функция для вращения рулетки бонусов
 async function spinBonusRoulette() {
     if (!currentUser) return;
     
-    // Проверяем, получал ли пользователь бонус сегодня
-    const today = new Date().toISOString().split('T')[0];
-    const { data: lastBonus, error } = await supabase
-        .from('daily_bonuses')
-        .select('*')
-        .eq('user_id', currentUser.id)
-        .order('claimed_at', { ascending: false })
-        .limit(1)
-        .single();
-    
-    if (lastBonus && lastBonus.claimed_at.split('T')[0] === today) {
-        showNotification('Вы уже получали бонус сегодня. Приходите завтра!');
-        return;
-    }
-    
     const spinBtn = document.getElementById('spin-roulette-btn');
+    if (spinBtn.disabled) return;
+    
     spinBtn.disabled = true;
     spinBtn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Крутим...';
     
@@ -391,26 +436,25 @@ async function spinBonusRoulette() {
     const items = document.querySelectorAll('.roulette-item');
     const itemWidth = items[0].offsetWidth;
     
-    // Определяем случайный приз (индекс от 0 до 5)
-    const prizeIndex = Math.floor(Math.random() * 6);
-    // Смещение, чтобы выбранный элемент оказался в центре
-    const offset = - (prizeIndex * itemWidth) + (roulette.offsetWidth / 2 - itemWidth / 2);
+    // Определяем случайный приз
+    const prizeIndex = Math.floor(Math.random() * items.length);
+    const spinDuration = 3000; // 3 секунды
     
-    // Добавляем дополнительные обороты для эффекта
+    // Добавляем дополнительные обороты
     const extraRotations = 3;
-    const totalOffset = offset - (extraRotations * 6 * itemWidth);
+    const totalOffset = -(prizeIndex * itemWidth) - (extraRotations * items.length * itemWidth);
     
     // Сбрасываем анимацию
     roulette.style.transition = 'none';
-    roulette.style.transform = `translateX(${-extraRotations * 6 * itemWidth}px)`;
+    roulette.style.transform = `translateX(${totalOffset}px)`;
     
-    // Даем браузеру время применить сброс
+    // Даем время на сброс
     setTimeout(() => {
-        roulette.style.transition = 'transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
-        roulette.style.transform = `translateX(${offset}px)`;
+        roulette.style.transition = `transform ${spinDuration/1000}s cubic-bezier(0.17, 0.67, 0.12, 0.99)`;
+        roulette.style.transform = `translateX(${-(prizeIndex * itemWidth)}px)`;
     }, 10);
     
-    // После завершения анимации
+    // Обработка результата после анимации
     setTimeout(async () => {
         const prize = items[prizeIndex];
         const prizeType = prize.getAttribute('data-type');
@@ -418,68 +462,57 @@ async function spinBonusRoulette() {
         
         let message = '';
         
-        // Обрабатываем выигрыш
+        // Добавляем анимацию выигрыша
+        prize.classList.add('pulse');
+        setTimeout(() => prize.classList.remove('pulse'), 2000);
+        
+        // Обработка приза
         switch (prizeType) {
             case 'balance':
                 const amount = parseInt(prizeValue);
-                const { error: balanceError } = await supabase
-                    .from('users')
-                    .update({ balance: userBalance + amount })
-                    .eq('id', currentUser.id);
-                
-                if (!balanceError) {
-                    userBalance += amount;
-                    document.getElementById('user-balance').textContent = userBalance;
-                    message = `🎉 Вы выиграли ${amount} монет!`;
-                }
+                userBalance += amount;
+                document.getElementById('user-balance').textContent = userBalance;
+                message = `🎉 Вы выиграли ${amount} монет!`;
+                await supabase.from('users').update({ balance: userBalance }).eq('id', currentUser.id);
                 break;
                 
             case 'discount':
-                // Сохраняем скидку для следующего кейса
                 localStorage.setItem('activeDiscount', prizeValue);
                 message = `🎁 Вы получили скидку ${prizeValue}% на следующий кейс!`;
                 break;
                 
             case 'item':
-                // Добавляем предмет в инвентарь
                 const itemRarity = prizeValue;
-                const { data: randomItem, error: itemError } = await supabase
+                const { data: randomItem } = await supabase
                     .from('items')
                     .select('*')
                     .eq('rarity', itemRarity)
                     .limit(1);
                 
                 if (randomItem && randomItem.length > 0) {
-                    const { error: inventoryError } = await supabase
-                        .from('inventory')
-                        .insert([{
-                            user_id: currentUser.id,
-                            item_id: randomItem[0].id,
-                            obtained_at: new Date().toISOString()
-                        }]);
-                    
-                    if (!inventoryError) {
-                        message = `🎁 Вы получили ${getRarityName(itemRarity)} предмет: ${randomItem[0].name}!`;
-                        await loadInventory();
-                    }
+                    await supabase.from('inventory').insert([{
+                        user_id: currentUser.id,
+                        item_id: randomItem[0].id,
+                        obtained_at: new Date().toISOString()
+                    }]);
+                    message = `🎁 Вы получили ${getRarityName(itemRarity)} предмет: ${randomItem[0].name}!`;
+                    await loadInventory();
                 }
                 break;
         }
         
         // Записываем получение бонуса
-        await supabase
-            .from('daily_bonuses')
-            .insert([{
-                user_id: currentUser.id,
-                type: prizeType,
-                value: prizeValue,
-                claimed_at: new Date().toISOString()
-            }]);
+        await supabase.from('daily_bonuses').insert([{
+            user_id: currentUser.id,
+            type: prizeType,
+            value: prizeValue,
+            claimed_at: new Date().toISOString()
+        }]);
         
         spinBtn.disabled = false;
         spinBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Крутить рулетку';
         showNotification(message);
-    }, 3100);
+    }, spinDuration + 100);
 }
 
 // Функция для обработки пополнения баланса

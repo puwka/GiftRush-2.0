@@ -81,7 +81,7 @@
                                 <div class="roulette-value">50 монет</div>
                             </div>
                             <div class="roulette-item" data-type="discount" data-value="10">
-                                <div class="roulette-icon"><i class="fas fa-tag"></i></div>
+                                <div class="roulette-icon"><i class="fas fa-percent"></i></div>
                                 <div class="roulette-value">10% скидка</div>
                             </div>
                             <div class="roulette-item" data-type="item" data-value="common">
@@ -93,7 +93,7 @@
                                 <div class="roulette-value">100 монет</div>
                             </div>
                             <div class="roulette-item" data-type="discount" data-value="20">
-                                <div class="roulette-icon"><i class="fas fa-tag"></i></div>
+                                <div class="roulette-icon"><i class="fas fa-percent"></i></div>
                                 <div class="roulette-value">20% скидка</div>
                             </div>
                             <div class="roulette-item" data-type="item" data-value="rare">
@@ -103,14 +103,62 @@
                         </div>
                         <div class="roulette-pointer"></div>
                     </div>
-                    
+
                     <button class="spin-roulette-btn" id="spin-roulette-btn">
                         <i class="fas fa-sync-alt"></i> Крутить рулетку
                     </button>
-                    
+
                     <p class="roulette-info">
                         <i class="fas fa-info-circle"></i> Крутите рулетку каждый день!
                     </p>
+
+                    <div class="possible-prizes">
+                        <h3>Возможные призы <i class="fas fa-info-circle"></i></h3>
+                        <div class="prizes-grid">
+                            <div class="prize-item" data-chance="20%">
+                                <div class="prize-icon"><i class="fas fa-coins"></i></div>
+                                <div class="prize-info">
+                                    <span>50 монет</span>
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                </div>
+                            </div>
+                            <div class="prize-item" data-chance="10%">
+                                <div class="prize-icon"><i class="fas fa-coins"></i></div>
+                                <div class="prize-info">
+                                    <span>100 монет</span>
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                </div>
+                            </div>
+                            <div class="prize-item" data-chance="15%">
+                                <div class="prize-icon"><i class="fas fa-percent"></i></div>
+                                <div class="prize-info">
+                                    <span>10% скидка</span>
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                </div>
+                            </div>
+                            <div class="prize-item" data-chance="15%">
+                                <div class="prize-icon"><i class="fas fa-percent"></i></div>
+                                <div class="prize-info">
+                                    <span>20% скидка</span>
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                </div>
+                            </div>
+                            <div class="prize-item" data-chance="25%">
+                                <div class="prize-icon"><i class="fas fa-box-open"></i></div>
+                                <div class="prize-info">
+                                    <span>Обычный предмет</span>
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                </div>
+                            </div>
+                            <div class="prize-item" data-chance="25%">
+                                <div class="prize-icon"><i class="fas fa-box-open"></i></div>
+                                <div class="prize-info">
+                                    <span>Редкий предмет</span>
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="bonus-section">
@@ -146,7 +194,10 @@
                         <input type="text" id="promo-input" placeholder="Введите промокод">
                         <button class="apply-promo-btn" id="apply-promo-btn">Активировать</button>
                     </div>
-                    <button class="create-promo-btn" id="create-promo-btn">Создать свой промокод</button>
+                    <!-- Замените существующую кнопку на эту -->
+                    <button class="create-promo-btn" id="create-promo-btn">
+                        <i class="fas fa-plus-circle"></i> Создать промокод
+                    </button>
                 </div>
             </div>
 
@@ -325,6 +376,47 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Модальное окно информации о шансах -->
+    <div class="modal" id="chance-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Шансы выпадения</h2>
+                <button class="close-modal" id="close-chance-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="chance-info-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно создания промокода -->
+    <!-- В index.html -->
+    <div class="modal" id="create-promo-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Создать промокод</h2>
+                <button class="close-modal" id="close-create-promo-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <input type="text" 
+                        id="promo-code-input" 
+                        placeholder="Введите ваш промокод"
+                        maxlength="12"
+                        class="promo-input">
+                    <button class="save-promo-btn" id="save-promo-btn">
+                        <i class="fas fa-save"></i> Сохранить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Уведомление о сохранении -->
+    <div class="save-notification" id="save-notification">
+        Промокод успешно сохранен!
     </div>
 
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
