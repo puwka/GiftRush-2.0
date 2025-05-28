@@ -145,29 +145,29 @@ async function loadInventory() {
 }
 
 // Функция для отрисовки предметов инвентаря
-function renderInventoryItems(filter = 'all') {
-    const inventoryContainer = document.getElementById('inventory-items');
-    inventoryContainer.innerHTML = '';
+// Обновленная функция отрисовки инвентаря
+function renderInventoryItems() {
+    const giftsContainer = document.getElementById('gifts-items');
+    const bonusContainer = document.getElementById('bonus-items');
     
-    let filteredItems = inventoryItems;
-    
-    if (filter !== 'all') {
-        filteredItems = inventoryItems.filter(item => item.items.rarity === filter);
-    }
-    
-    filteredItems.forEach(item => {
-        const itemElement = document.createElement('div');
-        itemElement.className = 'inventory-item';
-        itemElement.innerHTML = `
-            <img src="${item.items.image_url}" alt="${item.items.name}">
-            <div class="item-name">${item.items.name}</div>
-            <div class="item-price">${item.items.price} <i class="fas fa-coins"></i></div>
-            <div class="item-rarity ${'rarity-' + item.items.rarity}">${getRarityName(item.items.rarity)}</div>
+    giftsContainer.innerHTML = '';
+    bonusContainer.innerHTML = '';
+
+    inventoryItems.forEach(item => {
+        const element = document.createElement('div');
+        element.className = `inventory-item ${item.type}`;
+        element.innerHTML = `
+            <div class="item-badge ${item.type}-badge">${item.type === 'gift' ? '🎁' : '🎉'}</div>
+            <img src="${item.image}" alt="${item.name}">
+            <div class="item-name">${item.name}</div>
         `;
-        itemElement.addEventListener('click', () => openItemModal(item));
-        inventoryContainer.appendChild(itemElement);
+        
+        if(item.type === 'gift') giftsContainer.appendChild(element);
+        else bonusContainer.appendChild(element);
     });
 }
+
+
 
 // Функция для получения названия редкости
 function getRarityName(rarity) {
@@ -275,24 +275,31 @@ async function withdrawItem(item) {
 // Функция для инициализации вкладок
 function initTabs() {
     const tabLinks = document.querySelectorAll('.nav-item');
-    
+    const upgradeNotification = document.getElementById('upgrade-notification');
+
     tabLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             
-            // Удаляем активный класс у всех вкладок
-            tabLinks.forEach(l => l.classList.remove('active'));
+            const tabId = link.getAttribute('data-tab');
             
-            // Добавляем активный класс текущей вкладке
+            if (tabId === 'upgrade-tab') {
+                // Показываем кастомное уведомление
+                upgradeNotification.classList.add('show');
+                setTimeout(() => {
+                    upgradeNotification.classList.remove('show');
+                }, 3000);
+                return;
+            }
+            
+            // Остальной код без изменений
+            tabLinks.forEach(l => l.classList.remove('active'));
             link.classList.add('active');
             
-            // Скрываем все содержимое вкладок
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
             
-            // Показываем содержимое текущей вкладки
-            const tabId = link.getAttribute('data-tab');
             document.getElementById(tabId).classList.add('active');
         });
     });
@@ -419,6 +426,19 @@ function initButtons() {
         // Закрываем модалку и очищаем поле
         document.getElementById('create-promo-modal').classList.remove('active');
         document.getElementById('promo-code-input').value = '';
+    });
+
+    document.querySelectorAll('.inv-filter').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const type = btn.dataset.type;
+            document.querySelectorAll('.inv-filter').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            document.querySelectorAll('.inventory-container').forEach(container => {
+                container.classList.remove('active');
+                if(container.dataset.type === type) container.classList.add('active');
+            });
+        });
     });
 }
 
@@ -654,16 +674,48 @@ async function initCases() {
     }
     
     if (cases && cases.length > 0) {
-        renderCases(cases);
+        // Добавляем количество предметов для каждого кейса
+        const casesWithItems = await Promise.all(cases.map(async caseItem => {
+            const { count } = await supabase
+                .from('case_items')
+                .select('*', { count: 'exact' })
+                .eq('case_id', caseItem.id);
+            
+            return {
+                ...caseItem,
+                items_count: count || 0
+            };
+        }));
+        
+        renderCases(casesWithItems);
         initCaseFilters();
+        initCaseCategories();
     } else {
         console.log('No cases found in database');
     }
 }
 
+function initCaseCategories() {
+    document.querySelectorAll('.category-item').forEach(item => {
+        item.addEventListener('click', () => {
+            // Удаляем активный класс у всех категорий
+            document.querySelectorAll('.category-item').forEach(i => {
+                i.classList.remove('active');
+            });
+            
+            // Добавляем активный класс текущей категории
+            item.classList.add('active');
+            
+            // Здесь можно добавить фильтрацию по категориям
+            // Например, загрузить из БД кейсы определенной категории
+        });
+    });
+}
+
 // Функция для отрисовки кейсов
+// Обновленная функция для отрисовки кейсов
 function renderCases(cases, filter = 'all') {
-    const container = document.querySelector('.cases-container');
+    const container = document.querySelector('.cases-grid');
     container.innerHTML = '';
     
     const filteredCases = filter === 'all' 
@@ -676,21 +728,24 @@ function renderCases(cases, filter = 'all') {
         caseElement.setAttribute('data-case-id', caseItem.id);
         caseElement.setAttribute('data-rarity', caseItem.rarity);
         
+        // Добавляем класс "new-case" для новых кейсов (например, добавленных в последние 3 дня)
+        const isNew = new Date() - new Date(caseItem.created_at) < 3 * 24 * 60 * 60 * 1000;
+        if (isNew) caseElement.classList.add('new-case');
+        
         caseElement.innerHTML = `
             <div class="case-image" style="background-image: url('${caseItem.image_url}')">
+                <div class="case-badge">${caseItem.items_count} items</div>
                 <div class="case-rarity ${caseItem.rarity}">
                     ${getRarityName(caseItem.rarity)}
                 </div>
             </div>
             <div class="case-info">
-                <h3>${caseItem.name}</h3>
+                <div class="case-name">${caseItem.name}</div>
                 <div class="case-price">
-                    <span class="case-price-value">
+                    <div class="price-value">
                         ${caseItem.price} <i class="fas fa-coins"></i>
-                    </span>
-                    <span class="case-items-count">
-                        ${getRandomItemsCount()} предметов
-                    </span>
+                    </div>
+                    <div class="items-count">${getRandomItemsCount()} items</div>
                 </div>
             </div>
         `;
@@ -723,9 +778,10 @@ function initCaseFilters() {
                 .map(el => ({
                     id: el.getAttribute('data-case-id'),
                     rarity: el.getAttribute('data-rarity'),
-                    name: el.querySelector('h3').textContent,
-                    price: parseInt(el.querySelector('.case-price-value').textContent),
-                    image_url: el.querySelector('.case-image').style.backgroundImage.slice(5, -2)
+                    name: el.querySelector('.case-name').textContent,
+                    price: parseInt(el.querySelector('.price-value').textContent),
+                    image_url: el.querySelector('.case-image').style.backgroundImage.slice(5, -2),
+                    items_count: parseInt(el.querySelector('.case-badge').textContent)
                 }));
             
             renderCases(allCases, filter);

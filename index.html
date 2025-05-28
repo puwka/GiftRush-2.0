@@ -29,6 +29,23 @@
         <main class="app-main">
             <!-- Вкладка Кейсы -->
             <div class="tab-content active" id="cases-tab">
+                <div class="section-title">
+                    <i class="fas fa-box-open"></i>
+                    <h2>Коллекция кейсов</h2>
+                </div>
+                
+                <!-- Баннер с акцией -->
+                <div class="case-banner">
+                    <div class="banner-content">
+                        <h3>НОВЫЕ КЕЙСЫ</h3>
+                        <p>Открывай и получай эксклюзивные предметы</p>
+                        <div class="banner-timer">
+                            <i class="fas fa-clock"></i>
+                            <span>Акция закончится через: 12:34:56</span>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Фильтры кейсов -->
                 <div class="case-filters">
                     <button class="filter-btn active" data-filter="all">Все</button>
@@ -38,33 +55,31 @@
                     <button class="filter-btn" data-filter="epic">Эпические</button>
                     <button class="filter-btn" data-filter="legendary">Легендарные</button>
                 </div>
-                <div class="cases-container">
-                    <div class="case-card" data-case-id="1">
-                        <div class="case-image" style="background-image: url('assets/case1.png');"></div>
-                        <div class="case-info">
-                            <h3>Обычный кейс</h3>
-                            <div class="case-price">100 <i class="fas fa-coins"></i></div>
+                
+                <!-- Список кейсов -->
+                <div class="cases-grid">
+                    <!-- Кейсы будут загружаться из БД через JS -->
+                </div>
+                
+                <!-- Категории кейсов -->
+                <div class="case-categories">
+                    <h3>Категории</h3>
+                    <div class="categories-grid">
+                        <div class="category-item" data-category="popular">
+                            <i class="fas fa-fire"></i>
+                            <span>Популярные</span>
                         </div>
-                    </div>
-                    <div class="case-card" data-case-id="2">
-                        <div class="case-image" style="background-image: url('assets/case2.png');"></div>
-                        <div class="case-info">
-                            <h3>Редкий кейс</h3>
-                            <div class="case-price">300 <i class="fas fa-coins"></i></div>
+                        <div class="category-item" data-category="new">
+                            <i class="fas fa-star"></i>
+                            <span>Новые</span>
                         </div>
-                    </div>
-                    <div class="case-card" data-case-id="3">
-                        <div class="case-image" style="background-image: url('assets/case3.png');"></div>
-                        <div class="case-info">
-                            <h3>Эпический кейс</h3>
-                            <div class="case-price">500 <i class="fas fa-coins"></i></div>
+                        <div class="category-item" data-category="discount">
+                            <i class="fas fa-percent"></i>
+                            <span>Со скидкой</span>
                         </div>
-                    </div>
-                    <div class="case-card" data-case-id="4">
-                        <div class="case-image" style="background-image: url('assets/case4.png');"></div>
-                        <div class="case-info">
-                            <h3>Легендарный кейс</h3>
-                            <div class="case-price">1000 <i class="fas fa-coins"></i></div>
+                        <div class="category-item" data-category="premium">
+                            <i class="fas fa-crown"></i>
+                            <span>Премиум</span>
                         </div>
                     </div>
                 </div>
@@ -248,54 +263,177 @@
                 </div>
             </div>
 
-            <!-- Вкладка Профиль -->
+            <!-- В index.html (обновленная вкладка Профиль) -->
             <div class="tab-content" id="profile-tab">
-                <div class="profile-header">
-                    <div class="user-avatar" id="user-avatar">
-                        <img src="#" alt="Аватар" id="avatar-img">
+                <!-- Шапка профиля -->
+                <div class="profile-section">
+                    <div class="profile-header">
+                        <div class="user-card">
+                            <div class="user-avatar glow" id="user-avatar">
+                                <img src="#" alt="Аватар" id="avatar-img">
+                                <div class="online-status"></div>
+                                <div class="user-level-badge">Ур. <span id="user-level-value">1</span></div>
+                            </div>
+                            <div class="user-info">
+                                <h2 id="user-name">Имя пользователя</h2>
+                                <div class="user-stats">
+                                    <div class="stat-item">
+                                        <i class="fas fa-coins"></i>
+                                        <span id="user-balance-stat">0</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <i class="fas fa-box-open"></i>
+                                        <span id="cases-opened-stat">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="user-info">
-                        <h2 id="user-name">Имя пользователя</h2>
-                        <p class="user-id">ID: <span id="user-id">123456</span></p>
+
+                    <!-- Статистика -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-medal"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Опыт</h3>
+                                <div class="progress-container">
+                                    <div class="progress-bar" style="width: 30%;"></div>
+                                </div>
+                                <div class="stat-value">150/500 XP</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Рефералы</h3>
+                                <div class="stat-value" id="ref-count-stat">0</div>
+                                <div class="stat-label">Заработано: <span id="ref-earned-stat">0</span> USDT</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-gem"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Редкость</h3>
+                                <div class="rarity-badge epic">Эпический</div>
+                                <div class="stat-label">Топ 15% игроков</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Достижения</h3>
+                                <div class="stat-value">5/20</div>
+                                <div class="stat-label">Следующее: 100 XP</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="profile-stats">
-                    <div class="stat-item">
-                        <div class="stat-icon"><i class="fas fa-box-open"></i></div>
-                        <div class="stat-info">
-                            <div class="stat-value" id="cases-opened">0</div>
-                            <div class="stat-label">Кейсов открыто</div>
+                <!-- Инвентарь -->
+                <div class="profile-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-box-open"></i> Инвентарь
+                    </h2>
+                    
+                    <div class="inventory-nav">
+                        <button class="inv-filter active" data-type="gifts">Подарки</button>
+                        <button class="inv-filter" data-type="bonuses">Бонусы</button>
+                        <button class="inv-filter" data-type="other">Другое</button>
+                    </div>
+                    
+                    <div class="inventory-container active" data-type="gifts">
+                        <div class="inventory-grid" id="gifts-items">
+                            <!-- Элементы будут добавлены через JS -->
+                            <div class="empty-inventory">
+                                <i class="fas fa-box-open"></i>
+                                <p>Ваш инвентарь пуст</p>
+                                <button class="btn-primary">Открыть кейс</button>
+                            </div>
                         </div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-icon"><i class="fas fa-coins"></i></div>
-                        <div class="stat-info">
-                            <div class="stat-value" id="total-earned">0</div>
-                            <div class="stat-label">Всего заработано</div>
+                    
+                    <div class="inventory-container" data-type="bonuses">
+                        <div class="inventory-grid" id="bonus-items">
+                            <!-- Элементы будут добавлены через JS -->
+                            <div class="empty-inventory">
+                                <i class="fas fa-gift"></i>
+                                <p>Нет бонусных предметов</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-icon"><i class="fas fa-trophy"></i></div>
-                        <div class="stat-info">
-                            <div class="stat-value" id="user-level">1</div>
-                            <div class="stat-label">Уровень</div>
+                    
+                    <div class="inventory-container" data-type="other">
+                        <div class="inventory-grid" id="other-items">
+                            <!-- Элементы будут добавлены через JS -->
+                            <div class="empty-inventory">
+                                <i class="fas fa-archive"></i>
+                                <p>Здесь пока ничего нет</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="inventory-section">
-                    <h2><i class="fas fa-archive"></i> Инвентарь</h2>
-                    <div class="inventory-filters">
-                        <button class="filter-btn active">Все</button>
-                        <button class="filter-btn">Обычные</button>
-                        <button class="filter-btn">Редкие</button>
-                        <button class="filter-btn">Эпические</button>
-                        <button class="filter-btn">Легендарные</button>
+                
+                <!-- История операций -->
+                <div class="profile-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-history"></i> История операций
+                    </h2>
+                    
+                    <div class="operations-list">
+                        <div class="operation-item">
+                            <div class="operation-icon deposit">
+                                <i class="fas fa-coins"></i>
+                            </div>
+                            <div class="operation-info">
+                                <h3>Пополнение баланса</h3>
+                                <p>Сегодня, 15:30</p>
+                            </div>
+                            <div class="operation-amount positive">
+                                +500 <i class="fas fa-coins"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="operation-item">
+                            <div class="operation-icon case">
+                                <i class="fas fa-box-open"></i>
+                            </div>
+                            <div class="operation-info">
+                                <h3>Открытие кейса</h3>
+                                <p>Сегодня, 15:15</p>
+                            </div>
+                            <div class="operation-amount negative">
+                                -100 <i class="fas fa-coins"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="operation-item">
+                            <div class="operation-icon bonus">
+                                <i class="fas fa-gift"></i>
+                            </div>
+                            <div class="operation-info">
+                                <h3>Ежедневный бонус</h3>
+                                <p>Сегодня, 12:00</p>
+                            </div>
+                            <div class="operation-amount positive">
+                                +50 <i class="fas fa-coins"></i>
+                            </div>
+                        </div>
                     </div>
-                    <div class="inventory-items" id="inventory-items">
-                        <!-- Здесь будут элементы инвентаря -->
-                    </div>
+                    
+                    <button class="btn-secondary show-more-btn">
+                        Показать еще
+                    </button>
                 </div>
             </div>
         </main>
@@ -418,6 +556,8 @@
     <div class="save-notification" id="save-notification">
         Промокод успешно сохранен!
     </div>
+
+    <div class="custom-notification" id="upgrade-notification">Coming soon</div>
 
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script type="module" src="js/supabase.js"></script>
