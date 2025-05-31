@@ -586,18 +586,23 @@ function initTabs() {
 
 // Функция для инициализации модальных окон
 function initModals() {
-    // Модальное окно пополнения баланса
+    // Модальное окно пополнения баланса (новое)
     const depositModal = document.getElementById('deposit-modal');
     const addBalanceBtn = document.getElementById('add-balance-btn');
     const closeDepositModal = document.getElementById('close-deposit-modal');
     
     addBalanceBtn.addEventListener('click', () => {
         depositModal.classList.add('active');
+        resetDepositForm();
     });
     
     closeDepositModal.addEventListener('click', () => {
         depositModal.classList.remove('active');
     });
+    
+    // Добавьте новые обработчики для вкладок и ввода суммы
+    initDepositTabs();
+    initDepositInputs();
     
     // Модальное окно предмета
     const itemModal = document.getElementById('item-modal');
@@ -631,6 +636,85 @@ function initModals() {
             }
         });
     });
+}
+
+// Новые функции для работы с формой пополнения
+function initDepositTabs() {
+    const tabs = document.querySelectorAll('.deposit-tab');
+    const tabContents = document.querySelectorAll('.deposit-tab-content');
+    
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const tabId = tab.getAttribute('data-tab');
+            
+            // Убираем активный класс у всех вкладок
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            // Добавляем активный класс текущей вкладке
+            tab.classList.add('active');
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+            
+            // Пересчитываем суммы
+            calculateDeposit();
+        });
+    });
+}
+
+function initDepositInputs() {
+    const depositAmount = document.getElementById('deposit-amount');
+    const tonAmount = document.getElementById('ton-amount');
+    
+    depositAmount.addEventListener('input', calculateDeposit);
+    tonAmount.addEventListener('input', calculateDeposit);
+    
+    // Обработчик кнопки применения промокода
+    document.getElementById('apply-deposit-promo-btn').addEventListener('click', () => {
+        const promoCode = document.getElementById('deposit-promo').value.trim();
+        if (promoCode) {
+            applyPromoCode(promoCode).then(valid => {
+                if (valid) {
+                    calculateDeposit();
+                    showNotification('Промокод применен!');
+                }
+            });
+        }
+    });
+}
+
+function calculateDeposit() {
+    const activeTab = document.querySelector('.deposit-tab.active').getAttribute('data-tab');
+    let amount = 0;
+    let bonus = 0;
+    
+    if (activeTab === 'stars') {
+        amount = parseFloat(document.getElementById('deposit-amount').value) || 0;
+        // Здесь можно добавить проверку минимальной суммы для Stars
+    } else {
+        const ton = parseFloat(document.getElementById('ton-amount').value) || 0;
+        amount = Math.floor(ton * 100); // Примерный курс: 1 TON = 100 монет
+        bonus = Math.floor(amount * 0.2); // 20% бонус за TON
+    }
+    
+    // Обновляем отображаемые значения
+    document.getElementById('stars-receive').textContent = amount;
+    if (activeTab === 'ton') {
+        document.getElementById('ton-bonus').textContent = bonus;
+        document.getElementById('ton-receive').textContent = amount + bonus;
+    }
+    
+    // Обновляем итоговую информацию
+    document.getElementById('summary-amount').textContent = `${amount} монет`;
+    document.getElementById('summary-bonus').textContent = `${bonus} монет`;
+    document.getElementById('summary-total').textContent = `${amount + bonus} монет`;
+}
+
+function resetDepositForm() {
+    document.getElementById('deposit-amount').value = '';
+    document.getElementById('ton-amount').value = '';
+    document.getElementById('deposit-promo').value = '';
+    document.querySelector('.deposit-tab[data-tab="stars"]').click();
+    calculateDeposit();
 }
 
 // Функция для инициализации кнопок
@@ -950,42 +1034,46 @@ async function spinBonusRoulette() {
 }
 
 // Функция для обработки пополнения баланса
-async function processDeposit(amount) {
-    if (!currentUser) return;
+async function processDeposit() {
+    const activeTab = document.querySelector('.deposit-tab.active').getAttribute('data-tab');
+    const amountInput = activeTab === 'stars' ? 
+        document.getElementById('deposit-amount') : 
+        document.getElementById('ton-amount');
     
-    try {
-        // Здесь должна быть логика обработки платежа (например, через платежную систему)
-        // Для демонстрации просто добавляем сумму на баланс
-        
-        const { error } = await supabase
-            .from('users')
-            .update({ balance: userBalance + amount })
-            .eq('id', currentUser.id);
-        
-        if (error) throw error;
-        
-        // Добавляем запись в историю операций
-        await supabase
-            .from('transactions')
-            .insert([{
-                user_id: currentUser.id,
-                type: 'deposit',
-                amount: amount,
-                description: 'Пополнение баланса',
-                created_at: new Date().toISOString()
-            }]);
-        
-        // Обновляем UI
-        userBalance += amount;
-        document.getElementById('user-balance').textContent = userBalance;
-        document.getElementById('user-balance-stat').textContent = userBalance;
-        document.getElementById('deposit-modal').classList.remove('active');
-        
-        showNotification(`💰 Баланс успешно пополнен на ${amount} монет`);
-    } catch (error) {
-        console.error('Error processing deposit:', error);
-        showNotification('Ошибка при пополнении баланса');
+    const amount = parseFloat(amountInput.value);
+    
+    if (!amount || amount <= 0) {
+        showNotification('Введите корректную сумму');
+        return;
     }
+    
+    // Расчет итоговой суммы с учетом бонусов
+    let totalAmount = amount;
+    if (activeTab === 'ton') {
+        totalAmount += Math.floor(amount * 0.2); // 20% бонус
+    }
+    
+    // Здесь должна быть логика обработки платежа
+    // Для демонстрации просто добавляем сумму на баланс
+    const { error } = await supabase
+        .from('users')
+        .update({ balance: userBalance + totalAmount })
+        .eq('id', currentUser.id);
+    
+    if (error) {
+        console.error('Error updating balance:', error);
+        showNotification('Ошибка при пополнении баланса');
+        return;
+    }
+    
+    userBalance += totalAmount;
+    document.getElementById('user-balance').textContent = userBalance;
+    document.getElementById('deposit-modal').classList.remove('active');
+    
+    showNotification(`💰 Баланс успешно пополнен на ${totalAmount} монет`);
+    
+    // Сбрасываем форму
+    resetDepositForm();
 }
 
 // Функция для активации промокода

@@ -461,31 +461,93 @@
 
     <!-- Модальное окно пополнения баланса -->
     <div class="modal" id="deposit-modal">
-        <div class="modal-content">
+        <div class="modal-content deposit-modal">
             <div class="modal-header">
                 <h2>Пополнение баланса</h2>
                 <button class="close-modal" id="close-deposit-modal">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="deposit-options">
-                    <div class="deposit-option">
-                        <input type="radio" name="deposit-amount" id="amount-100" value="100">
-                        <label for="amount-100">100 <i class="fas fa-coins"></i> - $1.00</label>
+                <!-- Вкладки способов оплаты -->
+                <div class="deposit-tabs">
+                    <button class="deposit-tab active" data-tab="stars">
+                        <i class="fas fa-star"></i> Telegram Stars
+                    </button>
+                    <button class="deposit-tab" data-tab="ton">
+                        <i class="fab fa-telegram"></i> TON (+20%)
+                    </button>
+                </div>
+                
+                <!-- Контент вкладок -->
+                <div class="deposit-tab-content active" id="stars-tab">
+                    <div class="deposit-input-group">
+                        <label for="deposit-amount">Сумма пополнения</label>
+                        <div class="input-with-icon">
+                            <input type="number" id="deposit-amount" placeholder="Введите сумму" min="100" step="100">
+                            <i class="fas fa-coins"></i>
+                        </div>
                     </div>
-                    <div class="deposit-option">
-                        <input type="radio" name="deposit-amount" id="amount-300" value="300" checked>
-                        <label for="amount-300">300 <i class="fas fa-coins"></i> - $2.50</label>
-                    </div>
-                    <div class="deposit-option">
-                        <input type="radio" name="deposit-amount" id="amount-500" value="500">
-                        <label for="amount-500">500 <i class="fas fa-coins"></i> - $4.00</label>
-                    </div>
-                    <div class="deposit-option">
-                        <input type="radio" name="deposit-amount" id="amount-1000" value="1000">
-                        <label for="amount-1000">1000 <i class="fas fa-coins"></i> - $7.50</label>
+                    
+                    <div class="bonus-info">
+                        <i class="fas fa-gift"></i>
+                        <span>Вы получите: <span id="stars-receive">0</span> монет</span>
                     </div>
                 </div>
-                <button class="deposit-btn" id="confirm-deposit-btn">Пополнить</button>
+                
+                <div class="deposit-tab-content" id="ton-tab">
+                    <div class="deposit-input-group">
+                        <label for="ton-amount">Сумма в TON</label>
+                        <div class="input-with-icon">
+                            <input type="number" id="ton-amount" placeholder="Введите сумму" min="0.1" step="0.1">
+                            <i class="fab fa-telegram"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="bonus-info highlighted">
+                        <i class="fas fa-bolt"></i>
+                        <span>Бонус +20%: <span id="ton-bonus">0</span> монет</span>
+                    </div>
+                    
+                    <div class="bonus-info">
+                        <i class="fas fa-gift"></i>
+                        <span>Вы получите: <span id="ton-receive">0</span> монет</span>
+                    </div>
+                </div>
+                
+                <!-- Промокод -->
+                <div class="promo-input-container">
+                    <div class="promo-input-group">
+                        <input type="text" id="deposit-promo" placeholder="Введите промокод">
+                        <button class="apply-promo-btn" id="apply-promo-btn">
+                            <i class="fas fa-check"></i> Применить
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Итоговая информация -->
+                <div class="deposit-summary">
+                    <div class="summary-item">
+                        <span>Сумма:</span>
+                        <span id="summary-amount">0 монет</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Бонус:</span>
+                        <span id="summary-bonus">0 монет</span>
+                    </div>
+                    <div class="summary-item total">
+                        <span>Итого:</span>
+                        <span id="summary-total">0 монет</span>
+                    </div>
+                </div>
+                
+                <!-- Кнопка подтверждения -->
+                <button class="deposit-btn" id="confirm-deposit-btn">
+                    <i class="fas fa-arrow-right"></i> Перейти к оплате
+                </button>
+                
+                <div class="deposit-footer">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Безопасные платежи через Telegram</span>
+                </div>
             </div>
         </div>
     </div>

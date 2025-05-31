@@ -1077,46 +1077,6 @@ body {
     padding: 20px;
 }
 
-.deposit-options {
-    margin-bottom: 20px;
-}
-
-.deposit-option {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    background-color: rgba(0, 0, 0, 0.3);
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.deposit-option:hover {
-    background-color: rgba(0, 0, 0, 0.4);
-}
-
-.deposit-option input {
-    margin-right: 10px;
-}
-
-.deposit-btn {
-    width: 100%;
-    background: linear-gradient(135deg, var(--accent-color), #ff7675);
-    border: none;
-    color: white;
-    padding: 12px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.deposit-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
 .item-image-container {
     text-align: center;
     margin-bottom: 15px;
@@ -1191,6 +1151,269 @@ body {
 
 .withdraw-item-btn:hover {
     background-color: rgba(253, 121, 168, 0.1);
+}
+
+/* Новые стили для модального окна пополнения */
+.deposit-modal .modal-content {
+    max-width: 420px;
+    border-radius: 20px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #1e272e, #2d3436);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.deposit-modal .modal-header {
+    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    padding: 20px;
+    position: relative;
+}
+
+.deposit-modal .modal-header h2 {
+    font-size: 1.3rem;
+    color: white;
+    text-align: center;
+    margin: 0;
+}
+
+.deposit-modal .close-modal {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 1.5rem;
+    color: white;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.deposit-tabs {
+    display: flex;
+    margin: 15px 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.deposit-tab {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s;
+}
+
+.deposit-tab i {
+    font-size: 1.1rem;
+}
+
+.deposit-tab.active {
+    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    color: white;
+}
+
+.deposit-tab-content {
+    display: none;
+    padding: 0 5px;
+}
+
+.deposit-tab-content.active {
+    display: block;
+}
+
+.deposit-input-group {
+    margin-bottom: 15px;
+}
+
+.deposit-input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.input-with-icon {
+    position: relative;
+}
+
+.input-with-icon input {
+    width: 100%;
+    padding: 14px 15px 14px 45px;
+    border-radius: 12px;
+    border: 2px solid rgba(108, 92, 231, 0.3);
+    background: rgba(0, 0, 0, 0.3);
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.input-with-icon input:focus {
+    border-color: #6c5ce7;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+}
+
+.input-with-icon i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #a29bfe;
+    font-size: 1.1rem;
+}
+
+.bonus-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+}
+
+.bonus-info.highlighted {
+    background: rgba(253, 203, 110, 0.1);
+    color: #fdcb6e;
+}
+
+.bonus-info i {
+    color: #a29bfe;
+}
+
+.bonus-info.highlighted i {
+    color: #fdcb6e;
+}
+
+.promo-input-container {
+    margin: 15px 0;
+}
+
+.promo-input-group {
+    display: flex;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.promo-input-group input {
+    flex: 1;
+    padding: 12px 15px;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 0.95rem;
+}
+
+.promo-input-group input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.apply-promo-btn {
+    padding: 0 20px;
+    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    border: none;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+    font-size: 10px;
+}
+
+.apply-promo-btn:hover {
+    background: linear-gradient(135deg, #5c4cd7, #928bfe);
+    transform: translateY(-1px);
+}
+
+.apply-promo-btn:active {
+    transform: translateY(0);
+}
+
+.apply-promo-btn i {
+    font-size: 10px;
+}
+
+.deposit-summary {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    padding: 15px;
+    margin: 20px 0;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+}
+
+.summary-item:last-child {
+    margin-bottom: 0;
+}
+
+.summary-item.total {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #fdcb6e;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.deposit-btn {
+    width: 100%;
+    padding: 16px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #00b894, #55efc4);
+    border: none;
+    color: #1e272e;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(0, 184, 148, 0.4);
+}
+
+.deposit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 184, 148, 0.6);
+}
+
+.deposit-btn i {
+    transition: transform 0.3s;
+}
+
+.deposit-btn:hover i {
+    transform: translateX(3px);
+}
+
+.deposit-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.deposit-footer i {
+    color: #00b894;
 }
 
 /* Стили для страницы открытия кейса */
