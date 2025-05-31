@@ -665,21 +665,28 @@ function initDepositInputs() {
     const depositAmount = document.getElementById('deposit-amount');
     const tonAmount = document.getElementById('ton-amount');
     
-    depositAmount.addEventListener('input', calculateDeposit);
-    tonAmount.addEventListener('input', calculateDeposit);
+    if (depositAmount) {
+        depositAmount.addEventListener('input', calculateDeposit);
+    }
     
-    // Обработчик кнопки применения промокода
-    document.getElementById('apply-deposit-promo-btn').addEventListener('click', () => {
-        const promoCode = document.getElementById('deposit-promo').value.trim();
-        if (promoCode) {
-            applyPromoCode(promoCode).then(valid => {
-                if (valid) {
-                    calculateDeposit();
-                    showNotification('Промокод применен!');
-                }
-            });
-        }
-    });
+    if (tonAmount) {
+        tonAmount.addEventListener('input', calculateDeposit);
+    }
+    
+    const promoBtn = document.getElementById('apply-deposit-promo-btn');
+    if (promoBtn) {
+        promoBtn.addEventListener('click', () => {
+            const promoCode = document.getElementById('deposit-promo').value.trim();
+            if (promoCode) {
+                applyPromoCode(promoCode).then(valid => {
+                    if (valid) {
+                        calculateDeposit();
+                        showNotification('Промокод применен!');
+                    }
+                });
+            }
+        });
+    }
 }
 
 function calculateDeposit() {
@@ -1228,47 +1235,148 @@ function generatePromoCode() {
 // Функция для инициализации кейсов
 async function initCases() {
     try {
-        // Загружаем кейсы из Supabase
-        const { data: cases, error } = await supabase
-            .from('cases')
-            .select('*')
-            .order('price', { ascending: true });
+        console.log("Начало загрузки кейсов...");
         
-        if (error) throw error;
-        
-        if (cases && cases.length > 0) {
-            casesData = cases;
-            
-            // Добавляем количество предметов для каждого кейса
-            const casesWithItems = await Promise.all(cases.map(async caseItem => {
-                const { count } = await supabase
-                    .from('case_items')
-                    .select('*', { count: 'exact' })
-                    .eq('case_id', caseItem.id);
-                
-                return {
-                    ...caseItem,
-                    items_count: count || 0
-                };
-            }));
-            
-            renderCases(casesWithItems);
-            initCaseFilters();
-            initCaseCategories();
-        } else {
-            console.log('No cases found in database');
+        // Показываем индикатор загрузки
+        const container = document.querySelector('.cases-container');
+        container.innerHTML = `
+            <div class="case-loading">
+                <div class="loading-spinner"></div>
+                <p>Загрузка кейсов...</p>
+            </div>
+        `;
+
+        // 1. Сначала проверяем подключение к Supabase
+        if (!supabase) {
+            throw new Error("Supabase client не инициализирован");
         }
+
+        // 2. Делаем запрос к базе данных
+        const { data: cases, error, status } = await supabase
+            .from('cases')
+            .select(`
+                id,
+                name,
+                description,
+                image_url,
+                price,
+                rarity
+            `)
+            .order('price', { ascending: true });
+
+        console.log("Ответ от Supabase:", { status, error, cases });
+
+        if (error) {
+            throw error;
+        }
+
+        if (!cases || cases.length === 0) {
+            console.warn("В базе данных нет кейсов");
+            container.innerHTML = `
+                <div class="empty-inventory" style="grid-column: 1 / -1;">
+                    <i class="fas fa-box-open"></i>
+                    <p>Кейсы не найдены в базе данных</p>
+                </div>
+            `;
+            return;
+        }
+
+        // 3. Подсчитываем количество предметов для каждого кейса
+        const casesWithItems = cases.map(caseItem => {
+            return {
+                ...caseItem,
+                items_count: caseItem.case_items?.length || 0
+            };
+        });
+
+        console.log("Кейсы с количеством предметов:", casesWithItems);
+
+        // 4. Сохраняем данные и обновляем UI
+        casesData = casesWithItems;
+        renderCases(casesWithItems);
+        initCaseFilters();
+        initCaseCategories();
+
+        // 5. Обновляем баннер с акцией
+        const promoCase = cases.find(c => c.is_promo) || cases[0];
+        updatePromoBanner(promoCase);
+
     } catch (error) {
-        console.error('Error initializing cases:', error);
-        showNotification('Ошибка загрузки кейсов');
+        console.error("Ошибка при загрузке кейсов:", error);
+        
+        const container = document.querySelector('.cases-container');
+        container.innerHTML = `
+            <div class="empty-inventory" style="grid-column: 1 / -1;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Ошибка загрузки кейсов</p>
+                <small>${error.message}</small>
+            </div>
+        `;
+        
+        showNotification('Ошибка загрузки кейсов. Пожалуйста, попробуйте позже.');
     }
 }
 
+// Функция для обновления баннера с акцией
+function updatePromoBanner(promoCase) {
+    const banner = document.querySelector('.case-banner');
+    const bannerContent = document.querySelector('.banner-content h3');
+    const bannerDesc = document.querySelector('.banner-content p');
+    const bannerImage = document.querySelector('.banner-image');
+    
+    if (!promoCase) return;
+    
+    // Устанавливаем данные кейса в баннер
+    bannerContent.textContent = promoCase.name;
+    bannerDesc.textContent = promoCase.description || 'Ограниченная коллекция с эксклюзивными предметами';
+    
+    // Устанавливаем изображение кейса
+    if (promoCase.image_url) {
+        bannerImage.style.backgroundImage = `url('${promoCase.image_url}')`;
+    }
+    
+    // Устанавливаем класс редкости для баннера
+    banner.className = 'case-banner';
+    banner.classList.add(promoCase.rarity);
+    
+    // Устанавливаем таймер акции (если есть)
+    if (promoCase.promo_end) {
+        startPromoTimer(promoCase.promo_end);
+    }
+}
+
+// Функция для запуска таймера акции
+function startPromoTimer(endTime) {
+    const timerElement = document.querySelector('.timer-value');
+    if (!timerElement || !endTime) return;
+    
+    const endDate = new Date(endTime).getTime();
+    
+    const timer = setInterval(() => {
+        const now = new Date().getTime();
+        const distance = endDate - now;
+        
+        if (distance < 0) {
+            clearInterval(timer);
+            timerElement.textContent = 'Акция завершена';
+            return;
+        }
+        
+        // Вычисляем оставшееся время
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        
+        // Отображаем время
+        timerElement.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }, 1000);
+}
+
 function initCaseCategories() {
-    document.querySelectorAll('.category-item').forEach(item => {
+    document.querySelectorAll('.category-card').forEach(item => {
         item.addEventListener('click', () => {
             // Удаляем активный класс у всех категорий
-            document.querySelectorAll('.category-item').forEach(i => {
+            document.querySelectorAll('.category-card').forEach(i => {
                 i.classList.remove('active');
             });
             
@@ -1309,8 +1417,9 @@ function filterCasesByCategory(category) {
 }
 
 // Функция для отрисовки кейсов
+// Функция для отрисовки кейсов
 function renderCases(cases, filter = 'all') {
-    const container = document.querySelector('.cases-grid');
+    const container = document.querySelector('.cases-container');
     container.innerHTML = '';
     
     const filteredCases = filter === 'all' 

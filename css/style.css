@@ -108,50 +108,81 @@ body {
     display: block;
 }
 
-/* Стили для вкладки Кейсы */
+/* Обновленные стили для вкладки Кейсы */
+
+/* Баннер с акцией */
 .case-banner {
-    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-    border-radius: 15px;
-    padding: 15px;
-    margin: 15px 0;
     position: relative;
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3);
+    margin: 15px 0;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.8), rgba(253, 121, 168, 0.7));
+    box-shadow: 0 10px 30px rgba(108, 92, 231, 0.3);
+    transition: transform 0.3s;
 }
 
-.case-banner::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 100%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+.case-banner:hover {
+    transform: translateY(-5px);
+}
+
+.case-banner.premium {
+    background: linear-gradient(135deg, #6c5ce7, #fd79a8);
+}
+
+.case-banner.rare {
+    background: linear-gradient(135deg, #0984e3, #74b9ff);
+}
+
+.case-banner.legendary {
+    background: linear-gradient(135deg, #e84393, #fd79a8);
 }
 
 .banner-content {
     position: relative;
     z-index: 2;
+    width: 60%;
+}
+
+.banner-badge {
+    position: absolute;
+    top: 15px;
+    left: 0;
+    background: var(--accent-color);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 0 20px 20px 0;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
 }
 
 .banner-content h3 {
-    font-size: 1.3rem;
-    margin-bottom: 5px;
+    font-size: 1.5rem;
+    margin-bottom: 8px;
     color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .banner-content p {
     font-size: 0.9rem;
     opacity: 0.9;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     color: white;
 }
 
 .banner-timer {
     display: flex;
     align-items: center;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     color: white;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px 12px;
+    border-radius: 20px;
+    width: fit-content;
 }
 
 .banner-timer i {
@@ -159,16 +190,118 @@ body {
     color: #fdcb6e;
 }
 
-.cases-grid {
+.timer-value {
+    font-weight: 700;
+    color: #fdcb6e;
+}
+
+.banner-image {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 40%;
+    background-image: url('https://i.imgur.com/JQ9pRoD.png');
+    background-size: contain;
+    background-position: right center;
+    background-repeat: no-repeat;
+    opacity: 0.8;
+}
+
+/* Фильтры кейсов */
+.case-filters {
+    display: flex;
+    overflow-x: auto;
+    gap: 8px;
+    padding: 10px 0;
+    margin-bottom: 15px;
+    scrollbar-width: none;
+}
+
+.case-filters::-webkit-scrollbar {
+    display: none;
+}
+
+.filter-btn {
+    background-color: rgba(108, 92, 231, 0.1);
+    border: none;
+    color: var(--primary-color);
+    padding: 10px 15px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.filter-btn i {
+    font-size: 0.9rem;
+}
+
+.filter-btn.active {
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    color: white;
+    box-shadow: 0 4px 10px rgba(108, 92, 231, 0.4);
+}
+
+.filter-btn[data-filter="common"].active {
+    background: var(--rarity-common);
+}
+
+.filter-btn[data-filter="uncommon"].active {
+    background: var(--rarity-uncommon);
+}
+
+.filter-btn[data-filter="rare"].active {
+    background: var(--rarity-rare);
+}
+
+.filter-btn[data-filter="epic"].active {
+    background: var(--rarity-epic);
+}
+
+.filter-btn[data-filter="legendary"].active {
+    background: var(--rarity-legendary);
+}
+
+/* Контейнер кейсов */
+.cases-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 15px;
-    margin: 15px 0;
+    margin-bottom: 20px;
 }
 
+.case-loading {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px 0;
+    color: var(--secondary-color);
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(108, 92, 231, 0.2);
+    border-radius: 50%;
+    border-top-color: var(--primary-color);
+    margin: 0 auto 15px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Карточка кейса */
 .case-card {
     background: linear-gradient(135deg, rgba(45, 52, 54, 0.8), rgba(30, 39, 46, 0.9));
-    border-radius: 15px;
+    border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     transition: all 0.3s;
@@ -264,59 +397,6 @@ body {
     opacity: 0.7;
 }
 
-.case-categories {
-    margin: 25px 0 15px;
-}
-
-.case-categories h3 {
-    font-size: 1rem;
-    margin-bottom: 15px;
-    color: var(--secondary-color);
-    display: flex;
-    align-items: center;
-}
-
-.case-categories h3::before,
-.case-categories h3::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: rgba(108, 92, 231, 0.3);
-    margin: 0 10px;
-}
-
-.categories-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-}
-
-.category-item {
-    background: rgba(45, 52, 54, 0.6);
-    border-radius: 10px;
-    padding: 12px 5px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s;
-    border: 1px solid rgba(108, 92, 231, 0.2);
-}
-
-.category-item:hover {
-    background: rgba(108, 92, 231, 0.2);
-    transform: translateY(-3px);
-}
-
-.category-item i {
-    display: block;
-    font-size: 1.2rem;
-    margin-bottom: 5px;
-    color: var(--accent-color);
-}
-
-.category-item span {
-    font-size: 0.8rem;
-}
-
 /* Анимация для новых кейсов */
 @keyframes newItemPulse {
     0% { box-shadow: 0 0 0 0 rgba(253, 203, 110, 0.7); }
@@ -341,6 +421,115 @@ body {
     border-radius: 10px;
     z-index: 2;
     animation: newItemPulse 2s infinite;
+}
+
+/* Категории кейсов */
+.case-categories {
+    margin: 25px 0;
+}
+
+.categories-title {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    color: var(--secondary-color);
+    display: flex;
+    align-items: center;
+}
+
+.categories-title::before,
+.categories-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(108, 92, 231, 0.3);
+    margin: 0 10px;
+}
+
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.category-card {
+    background: rgba(45, 52, 54, 0.6);
+    border-radius: 12px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 1px solid rgba(108, 92, 231, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.category-card:hover {
+    background: rgba(108, 92, 231, 0.2);
+    transform: translateY(-3px);
+}
+
+.category-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+}
+
+.category-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    color: white;
+    font-size: 1.2rem;
+}
+
+.category-info h4 {
+    font-size: 0.95rem;
+    margin-bottom: 5px;
+}
+
+.category-info p {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.category-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--accent-color);
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+/* Адаптивность */
+@media (max-width: 500px) {
+    .case-banner {
+        height: 140px;
+        padding: 15px;
+    }
+    
+    .banner-content h3 {
+        font-size: 1.2rem;
+    }
+    
+    .categories-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .cases-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 /* Стили для вкладки Бонусы */
