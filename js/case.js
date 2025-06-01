@@ -1,25 +1,17 @@
-// case.js
 import supabase from './supabase.js';
-
-// Инициализация Telegram WebApp
-const tg = window.Telegram.WebApp;
-
-// Инициализация Supabase
-const supabaseUrl = 'https://kggaengzxmautimlvcgh.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtnZ2Flbmd6eG1hdXRpbWx2Y2doIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc2NTgzOTEsImV4cCI6MjA2MzIzNDM5MX0.2NFe8_6OnvCjGVueJuVA1cO9zsjYTttID8UR90l9T9Q';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
 // Глобальные переменные
 let currentUser = null;
 let userBalance = 0;
-let selectedCase = null;
+let caseData = null;
 let caseItems = [];
-let isSpinning = false;
-let spinTimeout = null;
+let selectedCount = 1;
+let wonItems = [];
 
-// Инициализация страницы
+// Инициализация приложения
 document.addEventListener('DOMContentLoaded', async () => {
     // Инициализация Telegram WebApp
+    const tg = window.Telegram.WebApp;
     tg.expand();
     
     // Получение данных пользователя из Telegram
@@ -27,301 +19,222 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     if (tgUser) {
         // Проверка или создание пользователя в БД
-        currentUser = await getUserOrCreate(tgUser);
+        currentUser = await getUser(tgUser);
+        
+        if (!currentUser) {
+            showNotification('Ошибка загрузки профиля');
+            return;
+        }
+        
+        // Обновление UI с данными пользователя
+        updateUserUI(currentUser);
         
         // Загрузка баланса
-        loadUserBalance();
+        await loadUserBalance();
     }
     
-    // Получение выбранного кейса
-    const caseId = localStorage.getItem('selectedCaseId');
-    if (caseId) {
-        loadCaseData(caseId);
-    } else {
-        // Если кейс не выбран, возвращаем на главную
-        window.location.href = 'index.html';
-    }
+    // Загрузка данных кейса
+    await loadCaseData();
     
-    // Инициализация кнопок
-    initButtons();
+    // Инициализация UI
+    initUI();
+    
+    // Инициализация обработчиков событий
+    initEventListeners();
 });
 
 // Функция для получения пользователя
-async function getUserOrCreate(tgUser) {
-    const { data: existingUser, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('telegram_id', tgUser.id)
-        .single();
-    
-    return existingUser;
+async function getUser(tgUser) {
+    try {
+        const { data: user, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('telegram_id', tgUser.id)
+            .single();
+        
+        if (error) throw error;
+        return user;
+    } catch (error) {
+        console.error('Error getting user:', error);
+        return null;
+    }
+}
+
+// Функция для обновления UI с данными пользователя
+function updateUserUI(user) {
+    document.getElementById('user-balance').textContent = user.balance;
+    userBalance = user.balance;
 }
 
 // Функция для загрузки баланса пользователя
 async function loadUserBalance() {
     if (!currentUser) return;
     
-    const { data, error } = await supabase
-        .from('users')
-        .select('balance')
-        .eq('id', currentUser.id)
-        .single();
-    
-    if (data) {
-        userBalance = data.balance;
+    try {
+        const { data, error } = await supabase
+            .from('users')
+            .select('balance')
+            .eq('id', currentUser.id)
+            .single();
+        
+        if (error) throw error;
+        
+        if (data) {
+            userBalance = data.balance;
+            document.getElementById('user-balance').textContent = userBalance;
+        }
+    } catch (error) {
+        console.error('Error loading balance:', error);
     }
 }
 
 // Функция для загрузки данных кейса
-async function loadCaseData(caseId) {
-    // Загружаем информацию о кейсе
-    const { data: caseData, error: caseError } = await supabase
-        .from('cases')
-        .select('*')
-        .eq('id', caseId)
-        .single();
-    
-    if (!caseData) {
-        showNotification('Кейс не найден');
-        window.location.href = 'index.html';
-        return;
-    }
-    
-    selectedCase = caseData;
-    
-    // Обновляем UI с информацией о кейсе
-    document.getElementById('case-preview-image').src = caseData.image_url;
-    document.getElementById('case-preview-name').textContent = caseData.name;
-    document.getElementById('case-preview-price').textContent = `Стоимость: ${caseData.price} `;
-    document.getElementById('open-case-btn').innerHTML = `Открыть за ${caseData.price} <i class="fas fa-coins"></i>`;
-    
-    // Загружаем предметы для этого кейса
-    const { data: itemsData, error: itemsError } = await supabase
-        .from('case_items')
-        .select('item_id, items (*)')
-        .eq('case_id', caseId);
-    
-    if (itemsData) {
-        caseItems = itemsData.map(ci => ci.items);
-        initRoulette();
-    }
-}
-
-// Функция для инициализации рулетки
-function initRoulette() {
-    const rouletteContainer = document.getElementById('roulette-items');
-    rouletteContainer.innerHTML = '';
-    
-    // Добавляем предметы в рулетку (повторяем для плавности)
-    for (let i = 0; i < 3; i++) {
-        caseItems.forEach(item => {
-            const itemElement = document.createElement('div');
-            itemElement.className = 'roulette-item';
-            itemElement.innerHTML = `
-                <img src="${item.image_url}" alt="${item.name}">
-                <div class="item-name">${item.name}</div>
-            `;
-            rouletteContainer.appendChild(itemElement);
-        });
-    }
-}
-
-// Функция для инициализации кнопок
-function initButtons() {
-    // Кнопка открытия кейса
-    document.getElementById('open-case-btn').addEventListener('click', () => {
-        if (isSpinning) return;
-        
-        if (userBalance < selectedCase.price) {
-            showNotification('Недостаточно средств');
+async function loadCaseData() {
+    try {
+        // Получаем ID кейса из localStorage
+        const caseId = localStorage.getItem('selectedCaseId');
+        if (!caseId) {
+            showNotification('Кейс не выбран');
+            window.location.href = 'index.html';
             return;
         }
         
-        openCase();
-    });
-    
-    // Кнопка возврата на главную
-    document.getElementById('back-to-main-btn').addEventListener('click', () => {
+        // Загружаем данные кейса
+        const { data: caseData, error: caseError } = await supabase
+            .from('cases')
+            .select('*')
+            .eq('id', caseId)
+            .single();
+        
+        if (caseError || !caseData) throw caseError || new Error('Кейс не найден');
+        
+        // Сохраняем данные кейса
+        caseData = caseData;
+        
+        // Загружаем предметы кейса
+        const { data: items, error: itemsError } = await supabase
+            .from('case_items')
+            .select(`
+                id,
+                chance,
+                items (id, name, image_url, rarity, price, withdrawable)
+            `)
+            .eq('case_id', caseId)
+            .order('chance', { ascending: false });
+        
+        if (itemsError) throw itemsError;
+        
+        // Сохраняем предметы кейса
+        caseItems = items.map(item => ({
+            ...item.items,
+            chance: item.chance
+        }));
+        
+        // Обновляем UI с данными кейса
+        updateCaseUI();
+        
+        // Заполняем рулетку и возможные призы
+        fillRoulette();
+        fillPossiblePrizes();
+        
+    } catch (error) {
+        console.error('Error loading case data:', error);
+        showNotification('Ошибка загрузки кейса');
         window.location.href = 'index.html';
+    }
+}
+
+// Функция для обновления UI с данными кейса
+function updateCaseUI() {
+    document.getElementById('case-title').textContent = caseData.name;
+    document.getElementById('case-name').textContent = caseData.name;
+    document.getElementById('case-description').textContent = caseData.description;
+    document.getElementById('case-price-value').textContent = caseData.price;
+    
+    // Устанавливаем изображение кейса
+    const caseImage = document.getElementById('case-image');
+    if (caseData.image_url) {
+        caseImage.src = caseData.image_url;
+    } else {
+        caseImage.src = 'https://via.placeholder.com/150';
+    }
+}
+
+// Функция для заполнения рулетки
+function fillRoulette() {
+    const roulette = document.getElementById('roulette-wheel');
+    roulette.innerHTML = '';
+    
+    // Создаем 50 элементов для плавной анимации
+    for (let i = 0; i < 50; i++) {
+        // Выбираем случайный предмет с учетом шансов
+        const randomItem = getRandomItem();
+        
+        const itemElement = document.createElement('div');
+        itemElement.className = 'roulette-item';
+        itemElement.setAttribute('data-item-id', randomItem.id);
+        itemElement.innerHTML = `
+            <div class="roulette-icon">
+                <img src="${randomItem.image_url}" alt="${randomItem.name}" style="width: 40px; height: 40px; object-fit: contain;">
+            </div>
+            <div class="roulette-value">${randomItem.name}</div>
+        `;
+        
+        roulette.appendChild(itemElement);
+    }
+}
+
+// Функция для заполнения возможных призов
+function fillPossiblePrizes() {
+    const prizesGrid = document.getElementById('prizes-grid');
+    prizesGrid.innerHTML = '';
+    
+    // Отображаем топ-6 предметов по редкости
+    const topItems = [...caseItems]
+        .sort((a, b) => b.price - a.price)
+        .slice(0, 6);
+    
+    topItems.forEach(item => {
+        const prizeElement = document.createElement('div');
+        prizeElement.className = 'prize-item';
+        prizeElement.innerHTML = `
+            <div class="prize-icon">
+                <img src="${item.image_url}" alt="${item.name}" style="width: 30px; height: 30px; object-fit: contain;">
+            </div>
+            <div class="prize-info">
+                <span>${getRarityName(item.rarity)}</span>
+                <i class="fas fa-info-circle info-icon" data-item-id="${item.id}"></i>
+            </div>
+            <div class="prize-chance">${item.chance}%</div>
+        `;
+        
+        prizesGrid.appendChild(prizeElement);
     });
     
-    // Кнопка "В инвентарь" в результате
-    document.getElementById('to-inventory-btn').addEventListener('click', () => {
-        window.location.href = 'index.html#profile-tab';
-    });
-    
-    // Кнопка "Открыть еще" в результате
-    document.getElementById('open-another-btn').addEventListener('click', () => {
-        document.getElementById('case-result').classList.remove('active');
-        isSpinning = false;
+    // Инициализация кнопок информации о предметах
+    document.querySelectorAll('.info-icon').forEach(icon => {
+        icon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const itemId = icon.getAttribute('data-item-id');
+            const item = caseItems.find(i => i.id == itemId);
+            showItemInfo(item);
+        });
     });
 }
 
-// Функция для открытия кейса
-async function openCase() {
-    if (!currentUser || !selectedCase || isSpinning) return;
+// Функция для получения случайного предмета с учетом шансов
+function getRandomItem() {
+    const totalChance = caseItems.reduce((sum, item) => sum + item.chance, 0);
+    let random = Math.random() * totalChance;
     
-    isSpinning = true;
-    
-    // Вычитаем стоимость кейса из баланса
-    const newBalance = userBalance - selectedCase.price;
-    
-    // Обновляем баланс в БД
-    const { error } = await supabase
-        .from('users')
-        .update({ balance: newBalance })
-        .eq('id', currentUser.id);
-    
-    if (error) {
-        console.error('Error updating balance:', error);
-        showNotification('Ошибка при открытии кейса');
-        isSpinning = false;
-        return;
+    for (const item of caseItems) {
+        if (random < item.chance) {
+            return item;
+        }
+        random -= item.chance;
     }
     
-    userBalance = newBalance;
-    
-    // Запускаем анимацию рулетки
-    startRoulette();
-}
-
-// Функция для запуска рулетки
-function startRoulette() {
-    const roulette = document.getElementById('roulette-items');
-    const itemWidth = 110; // Ширина одного предмета
-    const spinDuration = 3000; // Длительность вращения в мс
-    const slowDownDuration = 2000; // Длительность замедления
-    
-    // Выбираем случайный предмет для выигрыша (с учетом редкости)
-    const wonItem = getRandomItemWithRarity();
-    
-    // Находим индекс выигранного предмета
-    const wonIndex = caseItems.findIndex(item => item.id === wonItem.id);
-    
-    // Вычисляем позицию для остановки (центрируем выигранный предмет)
-    const stopPosition = -(wonIndex * itemWidth + (itemWidth * caseItems.length * 2) + (itemWidth * 3));
-    
-    // Начальная позиция
-    let startPosition = 0;
-    roulette.style.transform = `translateX(${startPosition}px)`;
-    
-    // Анимация вращения
-    let startTime = null;
-    let spinInterval = null;
-    
-    function spin(timestamp) {
-        if (!startTime) startTime = timestamp;
-        const progress = timestamp - startTime;
-        
-        if (progress < spinDuration) {
-            // Быстрое вращение
-            const distance = -progress * 0.5; // Скорость вращения
-            roulette.style.transform = `translateX(${distance}px)`;
-            requestAnimationFrame(spin);
-        } else if (progress < spinDuration + slowDownDuration) {
-            // Замедление
-            const timeLeft = spinDuration + slowDownDuration - progress;
-            const slowFactor = timeLeft / slowDownDuration;
-            const distance = stopPosition + (startPosition - stopPosition) * slowFactor;
-            roulette.style.transform = `translateX(${distance}px)`;
-            requestAnimationFrame(spin);
-        } else {
-            // Остановка
-            roulette.style.transform = `translateX(${stopPosition}px)`;
-            onRouletteStop(wonItem);
-        }
-    }
-    
-    requestAnimationFrame(spin);
-}
-
-// Функция для выбора случайного предмета с учетом редкости
-function getRandomItemWithRarity() {
-    // Создаем взвешенный массив на основе шансов выпадения
-    let weightedItems = [];
-    
-    caseItems.forEach(item => {
-        let weight = 1; // Базовый вес
-        
-        // Увеличиваем вес в зависимости от редкости кейса
-        switch (selectedCase.rarity) {
-            case 'common':
-                weight = item.rarity === 'common' ? 10 : 
-                         item.rarity === 'uncommon' ? 5 : 
-                         item.rarity === 'rare' ? 2 : 1;
-                break;
-            case 'uncommon':
-                weight = item.rarity === 'common' ? 5 : 
-                         item.rarity === 'uncommon' ? 10 : 
-                         item.rarity === 'rare' ? 5 : 2;
-                break;
-            case 'rare':
-                weight = item.rarity === 'common' ? 2 : 
-                         item.rarity === 'uncommon' ? 5 : 
-                         item.rarity === 'rare' ? 10 : 5;
-                break;
-            case 'epic':
-                weight = item.rarity === 'common' ? 1 : 
-                         item.rarity === 'uncommon' ? 2 : 
-                         item.rarity === 'rare' ? 5 : 10;
-                break;
-            case 'legendary':
-                weight = item.rarity === 'common' ? 1 : 
-                         item.rarity === 'uncommon' ? 1 : 
-                         item.rarity === 'rare' ? 2 : 5;
-                break;
-        }
-        
-        // Добавляем предмет в массив weight раз
-        for (let i = 0; i < weight; i++) {
-            weightedItems.push(item);
-        }
-    });
-    
-    // Выбираем случайный предмет из взвешенного массива
-    const randomIndex = Math.floor(Math.random() * weightedItems.length);
-    return weightedItems[randomIndex];
-}
-
-// Функция, вызываемая после остановки рулетки
-async function onRouletteStop(wonItem) {
-    // Добавляем предмет в инвентарь пользователя
-    const { error } = await supabase
-        .from('inventory')
-        .insert([{
-            user_id: currentUser.id,
-            item_id: wonItem.id,
-            obtained_at: new Date().toISOString()
-        }]);
-    
-    if (error) {
-        console.error('Error adding item to inventory:', error);
-        showNotification('Ошибка при получении предмета');
-        return;
-    }
-    
-    // Показываем результат
-    showResult(wonItem);
-}
-
-// Функция для показа результата
-function showResult(item) {
-    const resultContainer = document.getElementById('case-result');
-    const itemImage = document.getElementById('won-item-image');
-    const itemName = document.getElementById('won-item-name');
-    const itemRarity = document.getElementById('won-item-rarity');
-    const itemPrice = document.getElementById('won-item-price');
-    
-    itemImage.src = item.image_url;
-    itemName.textContent = item.name;
-    itemRarity.innerHTML = `Редкость: <span>${getRarityName(item.rarity)}</span>`;
-    itemPrice.innerHTML = `Цена: <span>${item.price}</span> <i class="fas fa-coins"></i>`;
-    
-    // Устанавливаем цвет редкости
-    const raritySpan = itemRarity.querySelector('span');
-    raritySpan.className = 'rarity-' + item.rarity;
-    
-    resultContainer.classList.add('active');
+    return caseItems[0];
 }
 
 // Функция для получения названия редкости
@@ -336,11 +249,317 @@ function getRarityName(rarity) {
     return rarities[rarity] || rarity;
 }
 
+// Функция для инициализации UI
+function initUI() {
+    // Устанавливаем активную кнопку количества
+    document.querySelector('.open-option[data-count="1"]').classList.add('active');
+}
+
+// Функция для инициализации обработчиков событий
+function initEventListeners() {
+    // Кнопка "Назад"
+    document.getElementById('back-btn').addEventListener('click', () => {
+        window.location.href = 'index.html';
+    });
+    
+    // Кнопки выбора количества
+    document.querySelectorAll('.open-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.open-option').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedCount = parseInt(btn.getAttribute('data-count'));
+            
+            // Обновляем текст кнопки открытия
+            const openBtn = document.getElementById('open-case-btn');
+            openBtn.innerHTML = `
+                <i class="fas fa-gift"></i> Открыть ${selectedCount}x (${caseData.price * selectedCount} <i class="fas fa-coins"></i>)
+            `;
+        });
+    });
+    
+    // Кнопка открытия кейса
+    document.getElementById('open-case-btn').addEventListener('click', openCase);
+    
+    // Кнопка информации о шансах
+    document.getElementById('chance-info-btn').addEventListener('click', showChanceInfo);
+    
+    // Модальные окна
+    document.getElementById('close-result-modal').addEventListener('click', () => {
+        document.getElementById('result-modal').classList.remove('active');
+    });
+    
+    document.getElementById('close-chance-modal').addEventListener('click', () => {
+        document.getElementById('chance-modal').classList.remove('active');
+    });
+    
+    // Кнопки в модальном окне результата
+    document.getElementById('sell-item-btn').addEventListener('click', sellWonItem);
+    document.getElementById('keep-item-btn').addEventListener('click', keepWonItem);
+    document.getElementById('open-again-btn').addEventListener('click', openAgain);
+}
+
+// Функция для открытия кейса
+async function openCase() {
+    if (!currentUser || !caseData) return;
+    
+    const openBtn = document.getElementById('open-case-btn');
+    const totalPrice = caseData.price * selectedCount;
+    
+    // Проверяем баланс
+    if (userBalance < totalPrice) {
+        showNotification('Недостаточно средств');
+        return;
+    }
+    
+    try {
+        // Блокируем кнопку
+        openBtn.disabled = true;
+        openBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Обработка...';
+        
+        // Снимаем деньги с баланса
+        const { error: balanceError } = await supabase
+            .from('users')
+            .update({ balance: userBalance - totalPrice })
+            .eq('id', currentUser.id);
+        
+        if (balanceError) throw balanceError;
+        
+        // Обновляем баланс в UI
+        userBalance -= totalPrice;
+        document.getElementById('user-balance').textContent = userBalance;
+        
+        // Добавляем запись в историю операций
+        await supabase
+            .from('transactions')
+            .insert([{
+                user_id: currentUser.id,
+                type: 'case',
+                amount: -totalPrice,
+                description: `Открытие кейса: ${caseData.name} (${selectedCount}x)`,
+                created_at: new Date().toISOString()
+            }]);
+        
+        // Определяем выигранные предметы
+        wonItems = [];
+        for (let i = 0; i < selectedCount; i++) {
+            wonItems.push(getRandomItem());
+        }
+        
+        // Запускаем анимацию рулетки
+        startRouletteAnimation();
+        
+    } catch (error) {
+        console.error('Error opening case:', error);
+        showNotification('Ошибка при открытии кейса');
+        openBtn.disabled = false;
+        openBtn.innerHTML = '<i class="fas fa-gift"></i> Открыть кейс';
+    }
+}
+
+// Функция для запуска анимации рулетки
+function startRouletteAnimation() {
+    const roulette = document.getElementById('roulette-wheel');
+    const items = document.querySelectorAll('.roulette-item');
+    const itemWidth = items[0].offsetWidth;
+    
+    // Определяем случайный предмет для остановки
+    const stopIndex = Math.floor(Math.random() * items.length);
+    const stopPosition = -(stopIndex * itemWidth);
+    
+    // Сбрасываем анимацию
+    roulette.style.transition = 'none';
+    roulette.style.transform = 'translateX(0)';
+    
+    // Даем время на сброс
+    setTimeout(() => {
+        // Запускаем анимацию
+        roulette.style.transition = 'transform 6s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
+        roulette.style.transform = `translateX(${stopPosition}px)`;
+        
+        // Показываем результат после анимации
+        setTimeout(() => {
+            showResult(wonItems[0]);
+        }, 6000);
+    }, 10);
+}
+
+// Функция для показа результата
+function showResult(item) {
+    const resultModal = document.getElementById('result-modal');
+    const itemImage = document.getElementById('won-item-image');
+    const itemName = document.getElementById('won-item-name');
+    const itemRarity = document.getElementById('won-item-rarity').querySelector('span');
+    const itemPrice = document.getElementById('won-item-price');
+    
+    // Заполняем данные предмета
+    itemImage.src = item.image_url;
+    itemName.textContent = item.name;
+    itemRarity.textContent = getRarityName(item.rarity);
+    itemRarity.className = item.rarity;
+    itemPrice.textContent = item.price;
+    
+    // Показываем модальное окно
+    resultModal.classList.add('active');
+    
+    // Разблокируем кнопку открытия
+    const openBtn = document.getElementById('open-case-btn');
+    openBtn.disabled = false;
+    openBtn.innerHTML = '<i class="fas fa-gift"></i> Открыть кейс';
+}
+
+// Функция для продажи выигранного предмета
+async function sellWonItem() {
+    if (!currentUser || wonItems.length === 0) return;
+    
+    try {
+        const item = wonItems[0];
+        
+        // Добавляем деньги на баланс
+        const { error: balanceError } = await supabase
+            .from('users')
+            .update({ balance: userBalance + item.price })
+            .eq('id', currentUser.id);
+        
+        if (balanceError) throw balanceError;
+        
+        // Обновляем баланс в UI
+        userBalance += item.price;
+        document.getElementById('user-balance').textContent = userBalance;
+        
+        // Добавляем запись в историю операций
+        await supabase
+            .from('transactions')
+            .insert([{
+                user_id: currentUser.id,
+                type: 'sell',
+                amount: item.price,
+                description: `Продажа предмета: ${item.name}`,
+                created_at: new Date().toISOString()
+            }]);
+        
+        // Закрываем модальное окно
+        document.getElementById('result-modal').classList.remove('active');
+        
+        showNotification(`Вы продали предмет за ${item.price} монет`);
+        
+    } catch (error) {
+        console.error('Error selling item:', error);
+        showNotification('Ошибка при продаже предмета');
+    }
+}
+
+// Функция для сохранения выигранного предмета
+async function keepWonItem() {
+    if (!currentUser || wonItems.length === 0) return;
+    
+    try {
+        const item = wonItems[0];
+        
+        // Добавляем предмет в инвентарь
+        const { error: inventoryError } = await supabase
+            .from('inventory')
+            .insert([{
+                user_id: currentUser.id,
+                item_id: item.id,
+                obtained_at: new Date().toISOString()
+            }]);
+        
+        if (inventoryError) throw inventoryError;
+        
+        // Закрываем модальное окно
+        document.getElementById('result-modal').classList.remove('active');
+        
+        showNotification(`Предмет "${item.name}" добавлен в инвентарь`);
+        
+    } catch (error) {
+        console.error('Error keeping item:', error);
+        showNotification('Ошибка при сохранении предмета');
+    }
+}
+
+// Функция для открытия еще одного кейса
+function openAgain() {
+    // Закрываем модальное окно
+    document.getElementById('result-modal').classList.remove('active');
+    
+    // Если есть еще выигранные предметы, показываем следующий
+    if (wonItems.length > 1) {
+        wonItems.shift();
+        showResult(wonItems[0]);
+    }
+}
+
+// Функция для показа информации о предмете
+function showItemInfo(item) {
+    const modal = document.getElementById('chance-modal');
+    const content = document.getElementById('chance-info-content');
+    
+    content.innerHTML = `
+        <div class="item-info">
+            <div class="item-image-container">
+                <img src="${item.image_url}" alt="${item.name}" style="max-width: 100%; max-height: 150px;">
+                <div class="item-rarity ${item.rarity}">${getRarityName(item.rarity)}</div>
+            </div>
+            <h3>${item.name}</h3>
+            <p>Шанс выпадения: <strong>${item.chance}%</strong></p>
+            <p>Цена продажи: <strong>${item.price} <i class="fas fa-coins"></i></strong></p>
+            ${item.withdrawable ? '<p><i class="fas fa-check-circle" style="color: #00b894;"></i> Можно вывести</p>' : ''}
+        </div>
+    `;
+    
+    modal.classList.add('active');
+}
+
+// Функция для показа информации о шансах
+function showChanceInfo() {
+    const modal = document.getElementById('chance-modal');
+    const content = document.getElementById('chance-info-content');
+    
+    // Группируем предметы по редкости
+    const itemsByRarity = {};
+    caseItems.forEach(item => {
+        if (!itemsByRarity[item.rarity]) {
+            itemsByRarity[item.rarity] = {
+                count: 0,
+                totalChance: 0,
+                items: []
+            };
+        }
+        itemsByRarity[item.rarity].count++;
+        itemsByRarity[item.rarity].totalChance += item.chance;
+        itemsByRarity[item.rarity].items.push(item);
+    });
+    
+    // Сортируем по редкости (от легендарных к обычным)
+    const sortedRarities = Object.entries(itemsByRarity).sort((a, b) => {
+        const rarityOrder = ['legendary', 'epic', 'rare', 'uncommon', 'common'];
+        return rarityOrder.indexOf(a[0]) - rarityOrder.indexOf(b[0]);
+    });
+    
+    // Формируем контент
+    let html = '<h3>Шансы по редкостям:</h3>';
+    
+    sortedRarities.forEach(([rarity, data]) => {
+        html += `
+            <div class="chance-item">
+                <div class="chance-rarity ${rarity}">${getRarityName(rarity)}</div>
+                <div class="chance-value">${data.totalChance.toFixed(2)}%</div>
+                <div class="chance-count">${data.count} предметов</div>
+            </div>
+        `;
+    });
+    
+    content.innerHTML = html;
+    modal.classList.add('active');
+}
+
 // Функция для показа уведомлений
 function showNotification(message) {
-    if (tg.showAlert) {
-        tg.showAlert(message);
+    // Можно использовать Telegram WebApp для показа уведомлений
+    if (window.Telegram?.WebApp?.showAlert) {
+        window.Telegram.WebApp.showAlert(message);
     } else {
+        // Fallback для браузера
         alert(message);
     }
 }

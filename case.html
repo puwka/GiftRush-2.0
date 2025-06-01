@@ -3,50 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Открытие кейса - GiftRush</title>
+    <title>Открытие кейса | GiftRush</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/case.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
     <div class="case-open-container">
+        <!-- Шапка как на главной странице -->
         <header class="case-header">
-            <h1>Открытие кейса</h1>
-            <button class="back-to-main" id="back-to-main-btn">
-                <i class="fas fa-times"></i>
+            <button class="back-to-main-btn" id="back-btn">
+                <i class="fas fa-arrow-left"></i>
             </button>
+            <h1 id="case-title">Открытие кейса</h1>
+            <div class="balance-container">
+                <span class="balance" id="user-balance">0</span>
+                <i class="fas fa-coins balance-icon"></i>
+            </div>
         </header>
 
+        <!-- Основное содержимое -->
         <main class="case-main">
+            <!-- Информация о кейсе -->
             <div class="case-preview">
-                <img src="assets/case1.png" alt="Кейс" id="case-preview-image">
-                <h2 id="case-preview-name">Обычный кейс</h2>
-                <p id="case-preview-price">Стоимость: 100 <i class="fas fa-coins"></i></p>
-            </div>
-
-            <div class="roulette-container">
-                <div class="roulette-items" id="roulette-items">
-                    <!-- Здесь будут элементы рулетки -->
+                <img src="" alt="Кейс" id="case-image">
+                <h2 id="case-name">Название кейса</h2>
+                <p id="case-description">Описание кейса</p>
+                <div class="case-price">
+                    <span id="case-price-value">100</span> <i class="fas fa-coins"></i>
                 </div>
             </div>
 
-            <button class="open-case-btn" id="open-case-btn">Открыть за 100 <i class="fas fa-coins"></i></button>
-        </main>
+            <!-- Кнопки выбора количества -->
+            <div class="open-options">
+                <button class="open-option active" data-count="1">1x</button>
+                <button class="open-option" data-count="3">3x</button>
+                <button class="open-option" data-count="5">5x</button>
+            </div>
 
-        <div class="case-result" id="case-result">
-            <div class="result-content">
+            <!-- Контейнер рулетки -->
+            <div class="roulette-container">
+                <div class="roulette-wheel" id="roulette-wheel">
+                    <!-- Предметы будут добавлены через JS -->
+                </div>
+                <div class="roulette-pointer"></div>
+            </div>
+
+            <!-- Кнопка открытия -->
+            <button class="open-case-btn" id="open-case-btn">
+                <i class="fas fa-gift"></i> Открыть кейс
+            </button>
+
+            <!-- Возможные призы -->
+            <div class="possible-prizes">
+                <h3>Возможные призы <i class="fas fa-info-circle" id="chance-info-btn"></i></h3>
+                <div class="prizes-grid" id="prizes-grid">
+                    <!-- Предметы будут добавлены через JS -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Модальное окно результата -->
+    <div class="modal" id="result-modal">
+        <div class="modal-content">
+            <div class="modal-header">
                 <h2>Поздравляем!</h2>
+                <button class="close-modal" id="close-result-modal">&times;</button>
+            </div>
+            <div class="modal-body">
                 <div class="won-item">
-                    <img src="assets/item1.png" alt="Выигранный предмет" id="won-item-image">
+                    <img src="" alt="Выигранный предмет" id="won-item-image">
                     <h3 id="won-item-name">Название предмета</h3>
                     <p id="won-item-rarity">Редкость: <span>Обычный</span></p>
-                    <p id="won-item-price">Цена: <span>50</span> <i class="fas fa-coins"></i></p>
+                    <div class="item-price">
+                        <span id="won-item-price">50</span> <i class="fas fa-coins"></i>
+                    </div>
                 </div>
                 <div class="result-actions">
-                    <button class="to-inventory-btn" id="to-inventory-btn">В инвентарь</button>
-                    <button class="open-another-btn" id="open-another-btn">Открыть еще</button>
+                    <button class="btn-primary" id="sell-item-btn">Продать</button>
+                    <button class="btn-secondary" id="keep-item-btn">Оставить</button>
+                    <button class="btn-tertiary" id="open-again-btn">Открыть еще</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно информации о шансах -->
+    <div class="modal" id="chance-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Шансы выпадения</h2>
+                <button class="close-modal" id="close-chance-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="chance-info-content"></div>
             </div>
         </div>
     </div>
