@@ -3,7 +3,7 @@ import supabase from './supabase.js';
 // Глобальные переменные
 let currentUser = null;
 let userBalance = 0;
-let caseData = null;
+let caseData = null; // Теперь можно перезаписывать
 let caseItems = [];
 let selectedCount = 1;
 let wonItems = [];
@@ -100,16 +100,16 @@ async function loadCaseData() {
         }
         
         // Загружаем данные кейса
-        const { data: caseData, error: caseError } = await supabase
+        const { data: caseDataFromDB, error: caseError } = await supabase
             .from('cases')
             .select('*')
             .eq('id', caseId)
             .single();
         
-        if (caseError || !caseData) throw caseError || new Error('Кейс не найден');
+        if (caseError || !caseDataFromDB) throw caseError || new Error('Кейс не найден');
         
-        // Сохраняем данные кейса
-        caseData = caseData;
+        // Сохраняем данные кейса (используем другое имя переменной)
+        caseData = caseDataFromDB;
         
         // Загружаем предметы кейса
         const { data: items, error: itemsError } = await supabase
