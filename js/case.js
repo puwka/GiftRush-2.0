@@ -328,19 +328,23 @@ async function openCase() {
         openBtn.disabled = true;
         openBtn.style.opacity = '0.5';
         
-        // Скрываем информацию о кейсе и выбор количества
-        document.getElementById('case-preview').classList.add('hidden');
-        document.getElementById('open-options').classList.add('hidden');
+        // Скрываем информацию о кейсе и выбор количества (проверяем существование элементов)
+        const casePreview = document.getElementById('case-preview');
+        const openOptions = document.querySelector('.open-options'); // Изменили с id на класс
+        const processingStatus = document.getElementById('processing-status');
         
-        // Показываем статус обработки
-        document.getElementById('processing-status').classList.add('visible');
+        if (casePreview) casePreview.classList.add('hidden');
+        if (openOptions) openOptions.classList.add('hidden');
+        if (processingStatus) processingStatus.classList.add('visible');
         
         // Показываем рулетку
         const rouletteContainer = document.getElementById('roulette-container');
-        rouletteContainer.style.display = 'block';
-        setTimeout(() => {
-            rouletteContainer.classList.add('visible');
-        }, 10);
+        if (rouletteContainer) {
+            rouletteContainer.style.display = 'block';
+            setTimeout(() => {
+                rouletteContainer.classList.add('visible');
+            }, 10);
+        }
         
         // Снимаем деньги с баланса
         const { error: balanceError } = await supabase
@@ -436,22 +440,31 @@ function showResult(item) {
 }
 
 function resetUI() {
-    // Возвращаем видимость элементов
-    document.getElementById('case-preview').classList.remove('hidden');
-    document.getElementById('open-options').classList.remove('hidden');
-    document.getElementById('processing-status').classList.remove('visible');
+    // Возвращаем видимость элементов (с проверкой на существование)
+    const casePreview = document.getElementById('case-preview');
+    const openOptions = document.querySelector('.open-options');
+    const processingStatus = document.getElementById('processing-status');
+    const rouletteContainer = document.getElementById('roulette-container');
+    const openBtn = document.getElementById('open-case-btn');
+    
+    if (casePreview) casePreview.classList.remove('hidden');
+    if (openOptions) openOptions.classList.remove('hidden');
+    if (processingStatus) processingStatus.classList.remove('visible');
     
     // Скрываем рулетку
-    document.getElementById('roulette-container').classList.remove('visible');
-    setTimeout(() => {
-        document.getElementById('roulette-container').style.display = 'none';
-    }, 300);
+    if (rouletteContainer) {
+        rouletteContainer.classList.remove('visible');
+        setTimeout(() => {
+            rouletteContainer.style.display = 'none';
+        }, 300);
+    }
     
     // Разблокируем кнопку открытия
-    const openBtn = document.getElementById('open-case-btn');
-    openBtn.disabled = false;
-    openBtn.style.opacity = '1';
-    openBtn.innerHTML = '<i class="fas fa-gift"></i> Открыть кейс';
+    if (openBtn) {
+        openBtn.disabled = false;
+        openBtn.style.opacity = '1';
+        openBtn.innerHTML = '<i class="fas fa-gift"></i> Открыть кейс';
+    }
 }
 
 // Функция для продажи выигранного предмета
