@@ -589,6 +589,14 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
+    transition: all 0.3s ease;
+}
+
+.open-options.hidden {
+    opacity: 0;
+    height: 0;
+    margin: 0;
+    overflow: hidden;
 }
 
 .open-option.active {
@@ -613,6 +621,8 @@
     opacity: 0;
     height: 0;
     overflow: hidden;
+    height: 220px; /* Было 180px */
+    margin: 15px 0;
 }
 
 .roulette-container.visible {
@@ -671,4 +681,20 @@
     bottom: -10px;
     border-top: 15px solid var(--accent-color);
     filter: drop-shadow(0 0 5px rgba(253, 121, 168, 0.7));
+}
+
+.processing-status {
+    text-align: center;
+    color: var(--accent-color);
+    font-size: 1.1rem;
+    margin: 10px 0;
+    height: 0;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.processing-status.visible {
+    height: auto;
+    opacity: 1;
+    margin: 20px 0;
 }

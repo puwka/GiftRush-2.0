@@ -326,18 +326,21 @@ async function openCase() {
     try {
         // Блокируем кнопку
         openBtn.disabled = true;
-        openBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Обработка...';
+        openBtn.style.opacity = '0.5';
         
-        // Скрываем информацию о кейсе и показываем рулетку
+        // Скрываем информацию о кейсе и выбор количества
         document.getElementById('case-preview').classList.add('hidden');
+        document.getElementById('open-options').classList.add('hidden');
+        
+        // Показываем статус обработки
+        document.getElementById('processing-status').classList.add('visible');
+        
+        // Показываем рулетку
         const rouletteContainer = document.getElementById('roulette-container');
         rouletteContainer.style.display = 'block';
         setTimeout(() => {
             rouletteContainer.classList.add('visible');
         }, 10);
-        
-        // Заполняем рулетку новыми предметами
-        fillRoulette();
         
         // Снимаем деньги с баланса
         const { error: balanceError } = await supabase
@@ -374,8 +377,7 @@ async function openCase() {
     } catch (error) {
         console.error('Error opening case:', error);
         showNotification('Ошибка при открытии кейса');
-        openBtn.disabled = false;
-        openBtn.innerHTML = '<i class="fas fa-gift"></i> Открыть кейс';
+        resetUI();
     }
 }
 
@@ -412,12 +414,8 @@ function startRouletteAnimation() {
 
 // Обновленная функция для показа результата
 function showResult(item) {
-    // Возвращаем видимость информации о кейсе
-    document.getElementById('case-preview').classList.remove('hidden');
-    document.getElementById('roulette-container').classList.remove('visible');
-    setTimeout(() => {
-        document.getElementById('roulette-container').style.display = 'none';
-    }, 300);
+    // Возвращаем видимость элементов
+    resetUI();
     
     // Показываем модальное окно с результатом
     const resultModal = document.getElementById('result-modal');
@@ -435,10 +433,24 @@ function showResult(item) {
     
     // Показываем модальное окно
     resultModal.classList.add('active');
+}
+
+function resetUI() {
+    // Возвращаем видимость элементов
+    document.getElementById('case-preview').classList.remove('hidden');
+    document.getElementById('open-options').classList.remove('hidden');
+    document.getElementById('processing-status').classList.remove('visible');
+    
+    // Скрываем рулетку
+    document.getElementById('roulette-container').classList.remove('visible');
+    setTimeout(() => {
+        document.getElementById('roulette-container').style.display = 'none';
+    }, 300);
     
     // Разблокируем кнопку открытия
     const openBtn = document.getElementById('open-case-btn');
     openBtn.disabled = false;
+    openBtn.style.opacity = '1';
     openBtn.innerHTML = '<i class="fas fa-gift"></i> Открыть кейс';
 }
 
