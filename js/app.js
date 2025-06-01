@@ -1287,8 +1287,8 @@ async function initCases() {
                 price,
                 rarity,
                 created_at,
-                is_promo,
-                promo_end
+                discount,
+                popularity
             `)
             .order('price', { ascending: true });
 
@@ -1329,8 +1329,7 @@ async function initCases() {
         initCaseCategories();
 
         // 4. Обновляем баннер с акцией
-        const promoCase = cases.find(c => c.is_promo) || cases[0];
-        updatePromoBanner(promoCase);
+        updatePromoBanner();
 
     } catch (error) {
         console.error("Ошибка при загрузке кейсов:", error);
@@ -1349,31 +1348,26 @@ async function initCases() {
 }
 
 // Функция для обновления баннера с акцией
-function updatePromoBanner(promoCase) {
+function updatePromoBanner() {
     const banner = document.querySelector('.case-banner');
     const bannerContent = document.querySelector('.banner-content h3');
     const bannerDesc = document.querySelector('.banner-content p');
     const bannerImage = document.querySelector('.banner-image');
     
+    // Берем первый кейс с максимальной скидкой или просто первый кейс
+    const promoCase = casesData.find(c => c.discount > 0) || casesData[0];
+    
     if (!promoCase) return;
     
-    // Устанавливаем данные кейса в баннер
     bannerContent.textContent = promoCase.name;
     bannerDesc.textContent = promoCase.description || 'Ограниченная коллекция с эксклюзивными предметами';
     
-    // Устанавливаем изображение кейса
     if (promoCase.image_url) {
         bannerImage.style.backgroundImage = `url('${promoCase.image_url}')`;
     }
     
-    // Устанавливаем класс редкости для баннера
     banner.className = 'case-banner';
     banner.classList.add(promoCase.rarity);
-    
-    // Устанавливаем таймер акции (если есть)
-    if (promoCase.promo_end) {
-        startPromoTimer(promoCase.promo_end);
-    }
 }
 
 // Функция для запуска таймера акции
