@@ -549,3 +549,126 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* case.css - добавьте эти стили */
+/* Стили для выбора количества кейсов */
+.open-options {
+    margin: 20px 0;
+    width: 100%;
+}
+
+.option-selector {
+    position: relative;
+    display: flex;
+    background: rgba(45, 52, 54, 0.6);
+    border-radius: 12px;
+    padding: 5px;
+    border: 1px solid rgba(108, 92, 231, 0.3);
+}
+
+.selector-highlight {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    height: calc(100% - 10px);
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
+.open-option {
+    flex: 1;
+    position: relative;
+    z-index: 2;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.open-option.active {
+    color: white;
+}
+
+/* Анимация для открытия кейса */
+.case-preview {
+    transition: all 0.3s ease;
+}
+
+.case-preview.hidden {
+    opacity: 0;
+    transform: translateY(-20px);
+    height: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+.roulette-container {
+    transition: all 0.3s ease;
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+}
+
+.roulette-container.visible {
+    opacity: 1;
+    height: 180px;
+    margin: 25px 0;
+}
+
+/* Улучшенная анимация рулетки */
+@keyframes wheelSpin {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(-50% + 75px)); }
+}
+
+.roulette-wheel.spinning {
+    animation: wheelSpin 3s cubic-bezier(0.17, 0.67, 0.12, 0.99) forwards;
+}
+
+/* Улучшенный указатель рулетки */
+.roulette-pointer {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, 
+        transparent, 
+        var(--accent-color), 
+        var(--primary-color), 
+        var(--accent-color), 
+        transparent);
+    z-index: 20;
+    box-shadow: 0 0 15px rgba(253, 121, 168, 0.7);
+}
+
+.roulette-pointer::before,
+.roulette-pointer::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+}
+
+.roulette-pointer::before {
+    top: -10px;
+    border-bottom: 15px solid var(--accent-color);
+    filter: drop-shadow(0 0 5px rgba(253, 121, 168, 0.7));
+}
+
+.roulette-pointer::after {
+    bottom: -10px;
+    border-top: 15px solid var(--accent-color);
+    filter: drop-shadow(0 0 5px rgba(253, 121, 168, 0.7));
+}

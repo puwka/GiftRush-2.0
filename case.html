@@ -25,9 +25,10 @@
         </header>
 
         <!-- Основное содержимое -->
+        <!-- case.html - изменения в основном контейнере -->
         <main class="case-main">
-            <!-- Информация о кейсе -->
-            <div class="case-preview">
+            <!-- Информация о кейсе (показывается по умолчанию) -->
+            <div class="case-preview" id="case-preview">
                 <img src="" alt="Кейс" id="case-image">
                 <h2 id="case-name">Название кейса</h2>
                 <p id="case-description">Описание кейса</p>
@@ -36,15 +37,18 @@
                 </div>
             </div>
 
-            <!-- Кнопки выбора количества -->
+            <!-- Кнопки выбора количества (современный стиль) -->
             <div class="open-options">
-                <button class="open-option active" data-count="1">1x</button>
-                <button class="open-option" data-count="3">3x</button>
-                <button class="open-option" data-count="5">5x</button>
+                <div class="option-selector">
+                    <button class="open-option active" data-count="1">1x</button>
+                    <button class="open-option" data-count="3">3x</button>
+                    <button class="open-option" data-count="5">5x</button>
+                    <div class="selector-highlight"></div>
+                </div>
             </div>
 
-            <!-- Контейнер рулетки -->
-            <div class="roulette-container">
+            <!-- Контейнер рулетки (изначально скрыт) -->
+            <div class="roulette-container" id="roulette-container" style="display: none;">
                 <div class="roulette-wheel" id="roulette-wheel">
                     <!-- Предметы будут добавлены через JS -->
                 </div>

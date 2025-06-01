@@ -263,10 +263,22 @@ function initEventListeners() {
     });
     
     // Кнопки выбора количества
-    document.querySelectorAll('.open-option').forEach(btn => {
+    const options = document.querySelectorAll('.open-option');
+    const highlight = document.querySelector('.selector-highlight');
+    
+    options.forEach(btn => {
         btn.addEventListener('click', () => {
-            document.querySelectorAll('.open-option').forEach(b => b.classList.remove('active'));
+            // Удаляем активный класс у всех кнопок
+            options.forEach(b => b.classList.remove('active'));
+            
+            // Добавляем активный класс текущей кнопке
             btn.classList.add('active');
+            
+            // Обновляем выделение
+            const index = Array.from(options).indexOf(btn);
+            highlight.style.transform = `translateX(${index * 100}%)`;
+            
+            // Сохраняем выбранное количество
             selectedCount = parseInt(btn.getAttribute('data-count'));
             
             // Обновляем текст кнопки открытия
@@ -316,6 +328,17 @@ async function openCase() {
         openBtn.disabled = true;
         openBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Обработка...';
         
+        // Скрываем информацию о кейсе и показываем рулетку
+        document.getElementById('case-preview').classList.add('hidden');
+        const rouletteContainer = document.getElementById('roulette-container');
+        rouletteContainer.style.display = 'block';
+        setTimeout(() => {
+            rouletteContainer.classList.add('visible');
+        }, 10);
+        
+        // Заполняем рулетку новыми предметами
+        fillRoulette();
+        
         // Снимаем деньги с баланса
         const { error: balanceError } = await supabase
             .from('users')
@@ -356,14 +379,14 @@ async function openCase() {
     }
 }
 
-// Функция для запуска анимации рулетки
+// Обновленная функция для запуска анимации рулетки
 function startRouletteAnimation() {
     const roulette = document.getElementById('roulette-wheel');
     const items = document.querySelectorAll('.roulette-item');
     const itemWidth = items[0].offsetWidth;
     
     // Определяем случайный предмет для остановки
-    const stopIndex = Math.floor(Math.random() * items.length);
+    const stopIndex = Math.floor(Math.random() * (items.length - 10)) + 5;
     const stopPosition = -(stopIndex * itemWidth);
     
     // Сбрасываем анимацию
@@ -372,19 +395,31 @@ function startRouletteAnimation() {
     
     // Даем время на сброс
     setTimeout(() => {
+        // Добавляем класс spinning для дополнительных эффектов
+        roulette.classList.add('spinning');
+        
         // Запускаем анимацию
         roulette.style.transition = 'transform 6s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
         roulette.style.transform = `translateX(${stopPosition}px)`;
         
         // Показываем результат после анимации
         setTimeout(() => {
+            roulette.classList.remove('spinning');
             showResult(wonItems[0]);
         }, 6000);
     }, 10);
 }
 
-// Функция для показа результата
+// Обновленная функция для показа результата
 function showResult(item) {
+    // Возвращаем видимость информации о кейсе
+    document.getElementById('case-preview').classList.remove('hidden');
+    document.getElementById('roulette-container').classList.remove('visible');
+    setTimeout(() => {
+        document.getElementById('roulette-container').style.display = 'none';
+    }, 300);
+    
+    // Показываем модальное окно с результатом
     const resultModal = document.getElementById('result-modal');
     const itemImage = document.getElementById('won-item-image');
     const itemName = document.getElementById('won-item-name');
