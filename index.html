@@ -658,6 +658,37 @@
     <div class="custom-notification" id="upgrade-notification">Coming soon</div>
 
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+        // Добавьте этот код перед подключением app.js
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                if (window.Telegram && window.Telegram.WebApp) {
+                    window.Telegram.WebApp.ready();
+                    window.Telegram.WebApp.expand();
+                } else {
+                    console.warn('Telegram WebApp API not available');
+                    // Режим отладки в браузере
+                    window.Telegram = {
+                        WebApp: {
+                            initDataUnsafe: {
+                                user: {
+                                    id: 123456789,
+                                    first_name: 'Test User',
+                                    username: 'testuser',
+                                    photo_url: 'https://via.placeholder.com/150'
+                                }
+                            },
+                            ready: function() { console.log('Telegram WebApp ready') },
+                            expand: function() { console.log('Telegram WebApp expand') },
+                            showAlert: function(msg) { alert(msg) }
+                        }
+                    };
+                }
+            } catch (error) {
+                console.error('Telegram WebApp initialization error:', error);
+            }
+        });
+    </script>
     <script type="module" src="js/supabase.js"></script>
     <script type="module" src="js/app.js"></script>
 </body>

@@ -1,13 +1,23 @@
-import supabase from './supabase.js';
-
 // Инициализация Telegram WebApp
-const tg = window.Telegram.WebApp;
+const tg = window.Telegram?.WebApp || {
+    initDataUnsafe: {},
+    expand: () => console.log('expand'),
+    enableClosingConfirmation: () => console.log('enableClosingConfirmation'),
+    showAlert: (msg) => alert(msg)
+};
 
 // Глобальные переменные
 let currentUser = null;
 let userBalance = 0;
 let inventoryItems = [];
 let casesData = [];
+
+// Проверка поддержки модулей
+if (typeof supabase === 'undefined') {
+    console.error('Supabase is not defined');
+    // Загрузите supabase из CDN, если не загрузился как модуль
+    document.write('<script src="https://unpkg.com/@supabase/supabase-js@2"><\/script>');
+}
 
 // Инициализация приложения
 document.addEventListener('DOMContentLoaded', async () => {
@@ -121,35 +131,57 @@ function updateUserUI(user) {
     if (!user) return;
 
     // Основная информация
-    document.getElementById('user-name').textContent = user.first_name || `User ${user.id}`;
-    document.getElementById('user-id').textContent = user.id;
-    document.getElementById('user-balance').textContent = user.balance;
-    document.getElementById('user-balance-stat').textContent = user.balance;
-    document.getElementById('user-level-value').textContent = user.level;
+    const userNameElement = document.getElementById('user-name');
+    const userBalanceElement = document.getElementById('user-balance');
+    const userBalanceStatElement = document.getElementById('user-balance-stat');
+    const userLevelValueElement = document.getElementById('user-level-value');
+    
+    if (userNameElement) userNameElement.textContent = user.first_name || `User ${user.id}`;
+    if (userBalanceElement) userBalanceElement.textContent = user.balance;
+    if (userBalanceStatElement) userBalanceStatElement.textContent = user.balance;
+    if (userLevelValueElement) userLevelValueElement.textContent = user.level;
     
     // Установка аватара (если есть)
     const avatarImg = document.getElementById('avatar-img');
-    if (window.Telegram.WebApp.initDataUnsafe.user?.photo_url) {
-        avatarImg.src = window.Telegram.WebApp.initDataUnsafe.user.photo_url;
-    } else {
-        avatarImg.src = 'https://via.placeholder.com/150';
+    if (avatarImg) {
+        if (window.Telegram.WebApp.initDataUnsafe.user?.photo_url) {
+            avatarImg.src = window.Telegram.WebApp.initDataUnsafe.user.photo_url;
+        } else {
+            avatarImg.src = 'https://via.placeholder.com/150';
+        }
     }
     
     // Обновление реферальной ссылки
-    const botUsername = window.Telegram.WebApp.initDataUnsafe.user?.username || 'your_bot';
-    document.getElementById('referral-link').value = `https://t.me/${botUsername}?start=ref_${user.referral_code}`;
+    const referralLinkElement = document.getElementById('referral-link');
+    if (referralLinkElement) {
+        const botUsername = window.Telegram.WebApp.initDataUnsafe.user?.username || 'your_bot';
+        referralLinkElement.value = `https://t.me/${botUsername}?start=ref_${user.referral_code}`;
+    }
     
     // Обновление статистики
-    document.getElementById('ref-count').textContent = user.referrals_count || 0;
-    document.getElementById('ref-earned').textContent = (user.referrals_count * 50) || 0;
-    document.getElementById('ref-count-stat').textContent = user.referrals_count || 0;
-    document.getElementById('ref-earned-stat').textContent = (user.referrals_count * 50) || 0;
+    const refCountElement = document.getElementById('ref-count');
+    const refEarnedElement = document.getElementById('ref-earned');
+    const refCountStatElement = document.getElementById('ref-count-stat');
+    const refEarnedStatElement = document.getElementById('ref-earned-stat');
+    
+    if (refCountElement) refCountElement.textContent = user.referrals_count || 0;
+    if (refEarnedElement) refEarnedElement.textContent = (user.referrals_count * 50) || 0;
+    if (refCountStatElement) refCountStatElement.textContent = user.referrals_count || 0;
+    if (refEarnedStatElement) refEarnedStatElement.textContent = (user.referrals_count * 50) || 0;
     
     // Прогресс уровня
-    const expNeeded = calculateExpNeeded(user.level);
-    const expProgress = (user.experience / expNeeded) * 100;
-    document.querySelector('.progress-bar').style.width = `${expProgress}%`;
-    document.querySelector('.stat-value').textContent = `${user.experience}/${expNeeded} XP`;
+    const progressBar = document.querySelector('.progress-bar');
+    if (progressBar) {
+        const expNeeded = calculateExpNeeded(user.level);
+        const expProgress = (user.experience / expNeeded) * 100;
+        progressBar.style.width = `${expProgress}%`;
+    }
+    
+    const statValueElement = document.querySelector('.stat-value');
+    if (statValueElement) {
+        const expNeeded = calculateExpNeeded(user.level);
+        statValueElement.textContent = `${user.experience}/${expNeeded} XP`;
+    }
 }
 
 // Функция для расчета необходимого опыта для уровня
@@ -1246,13 +1278,8 @@ async function initCases() {
             </div>
         `;
 
-        // 1. Сначала проверяем подключение к Supabase
-        if (!supabase) {
-            throw new Error("Supabase client не инициализирован");
-        }
-
-        // 2. Делаем запрос к базе данных
-        const { data: cases, error, status } = await supabase
+        // 1. Сначала загружаем кейсы
+        const { data: cases, error: casesError } = await supabase
             .from('cases')
             .select(`
                 id,
@@ -1260,15 +1287,14 @@ async function initCases() {
                 description,
                 image_url,
                 price,
-                rarity
+                rarity,
+                created_at,
+                is_promo,
+                promo_end
             `)
             .order('price', { ascending: true });
 
-        console.log("Ответ от Supabase:", { status, error, cases });
-
-        if (error) {
-            throw error;
-        }
+        if (casesError) throw casesError;
 
         if (!cases || cases.length === 0) {
             console.warn("В базе данных нет кейсов");
@@ -1281,23 +1307,30 @@ async function initCases() {
             return;
         }
 
-        // 3. Подсчитываем количество предметов для каждого кейса
-        const casesWithItems = cases.map(caseItem => {
-            return {
-                ...caseItem,
-                items_count: caseItem.case_items?.length || 0
-            };
-        });
+        // 2. Затем для каждого кейса загружаем количество предметов
+        const casesWithItems = await Promise.all(cases.map(async (caseItem) => {
+            const { count: itemsCount, error: countError } = await supabase
+                .from('case_items')
+                .select('*', { count: 'exact', head: true })
+                .eq('case_id', caseItem.id);
+
+            if (countError) {
+                console.error(`Error counting items for case ${caseItem.id}:`, countError);
+                return { ...caseItem, items_count: 0 };
+            }
+
+            return { ...caseItem, items_count: itemsCount || 0 };
+        }));
 
         console.log("Кейсы с количеством предметов:", casesWithItems);
 
-        // 4. Сохраняем данные и обновляем UI
+        // 3. Сохраняем данные и обновляем UI
         casesData = casesWithItems;
         renderCases(casesWithItems);
         initCaseFilters();
         initCaseCategories();
 
-        // 5. Обновляем баннер с акцией
+        // 4. Обновляем баннер с акцией
         const promoCase = cases.find(c => c.is_promo) || cases[0];
         updatePromoBanner(promoCase);
 
@@ -1416,8 +1449,6 @@ function filterCasesByCategory(category) {
     renderCases(filteredCases);
 }
 
-// Функция для отрисовки кейсов
-// Функция для отрисовки кейсов
 function renderCases(cases, filter = 'all') {
     const container = document.querySelector('.cases-container');
     container.innerHTML = '';
@@ -1447,7 +1478,7 @@ function renderCases(cases, filter = 'all') {
         if (isNew) caseElement.classList.add('new-case');
         
         caseElement.innerHTML = `
-            <div class="case-image" style="background-image: url('${caseItem.image_url}')">
+            <div class="case-image" style="background-image: url('${caseItem.image_url || 'https://via.placeholder.com/150'}')">
                 <div class="case-badge">${caseItem.items_count} items</div>
                 <div class="case-rarity ${caseItem.rarity}">
                     ${getRarityName(caseItem.rarity)}
