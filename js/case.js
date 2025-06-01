@@ -198,14 +198,17 @@ function fillPossiblePrizes() {
         const prizeElement = document.createElement('div');
         prizeElement.className = 'prize-item';
         prizeElement.innerHTML = `
-            <div class="prize-icon">
-                <img src="${item.image_url}" alt="${item.name}" style="width: 30px; height: 30px; object-fit: contain;">
+            <div class="prize-icon-container">
+                <div class="prize-icon">
+                    <img src="${item.image_url}" alt="${item.name}">
+                </div>
+                <div class="prize-name">${item.name}</div>
             </div>
             <div class="prize-info">
-                <span>${getRarityName(item.rarity)}</span>
+                <span class="prize-rarity ${item.rarity}">${getRarityName(item.rarity)}</span>
                 <i class="fas fa-info-circle info-icon" data-item-id="${item.id}"></i>
             </div>
-            <div class="prize-chance">${item.chance}%</div>
+            <div class="prize-chance">${item.chance}</div>
         `;
         
         prizesGrid.appendChild(prizeElement);
