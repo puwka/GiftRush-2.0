@@ -12,11 +12,9 @@ let userBalance = 0;
 let inventoryItems = [];
 let casesData = [];
 
-// Проверка поддержки модулей
-if (typeof supabase === 'undefined') {
-    console.error('Supabase is not defined');
-    // Загрузите supabase из CDN, если не загрузился как модуль
-    document.write('<script src="https://unpkg.com/@supabase/supabase-js@2"><\/script>');
+if (typeof window.supabase === 'undefined') {
+    console.error('Supabase is not initialized');
+    // Можно добавить fallback инициализацию здесь
 }
 
 // Инициализация приложения
@@ -70,7 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function getUserOrCreate(tgUser) {
     try {
         // Проверяем, есть ли пользователь в БД
-        const { data: existingUser, error } = await supabase
+        const { data: existingUser, error } = await window.supabase
             .from('users')
             .select('*')
             .eq('telegram_id', tgUser.id)
@@ -81,7 +79,7 @@ async function getUserOrCreate(tgUser) {
         }
         
         // Создаем нового пользователя
-        const { data: newUser, error: createError } = await supabase
+        const { data: newUser, error: createError } = await window.supabase
             .from('users')
             .insert([{
                 telegram_id: tgUser.id,
@@ -104,7 +102,7 @@ async function getUserOrCreate(tgUser) {
         if (createError) throw createError;
         
         // Создаем первую запись в истории операций
-        await supabase
+        await window.supabase
             .from('transactions')
             .insert([{
                 user_id: newUser.id,
