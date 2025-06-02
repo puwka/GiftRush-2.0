@@ -30,6 +30,7 @@ body {
 }
 
 .app-container {
+    display: none; /* По умолчанию скрыт */
     display: flex;
     flex-direction: column;
     height: 100vh;
@@ -2988,30 +2989,40 @@ body {
     opacity: 0.8;
 }
 
-.social-links {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
+.tg-channel {
     margin-top: 30px;
+    text-align: center;
 }
 
-.social-link {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: rgba(108, 92, 231, 0.2);
-    display: flex;
+.tg-channel p {
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.tg-channel-btn {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
-    color: var(--secondary-color);
-    transition: all 0.3s;
-}
-
-.social-link:hover {
     background: var(--primary-color);
     color: white;
-    transform: translateY(-3px);
+    padding: 12px 25px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+}
+
+.tg-channel-btn:hover {
+    background: #4a3fbb;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(108, 92, 231, 0.6);
+}
+
+.tg-channel-btn i {
+    margin-right: 10px;
+    font-size: 1.2rem;
 }
 
 @media (max-width: 600px) {

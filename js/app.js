@@ -19,6 +19,10 @@ if (typeof window.supabase === 'undefined') {
 
 // Инициализация приложения
 document.addEventListener('DOMContentLoaded', async () => {
+    // Сначала показываем экран "В разработке"
+    const comingSoonScreen = document.getElementById('coming-soon-screen');
+    const appContainer = document.querySelector('.app-container');
+    
     // Инициализация Telegram WebApp
     tg.expand();
     tg.enableClosingConfirmation();
@@ -27,49 +31,120 @@ document.addEventListener('DOMContentLoaded', async () => {
     const tgUser = tg.initDataUnsafe?.user;
     
     if (tgUser) {
-        // Проверка или создание пользователя в БД
-        currentUser = await getUserOrCreate(tgUser);
-        
-        if (!currentUser) {
-            showNotification('Ошибка загрузки профиля');
-            return;
+        try {
+            // Проверка или создание пользователя в БД
+            currentUser = await getUserOrCreate(tgUser);
+            
+            if (!currentUser) {
+                showNotification('Ошибка загрузки профиля');
+                return;
+            }
+            
+            // Проверка роли пользователя
+            if (currentUser.role === 2) { // Если админ
+                comingSoonScreen.style.display = 'none';
+                appContainer.style.display = 'flex'; // Показываем основное приложение
+                
+                // Инициализация приложения для админа
+                updateUserUI(currentUser);
+                await loadUserBalance();
+                await loadInventory();
+                await initCases();
+                await loadTransactions();
+            } else {
+                // Для обычных пользователей показываем экран "В разработке"
+                comingSoonScreen.style.display = 'flex';
+                appContainer.style.display = 'none';
+                initComingSoonScreen();
+            }
+        } catch (error) {
+            console.error('Error during initialization:', error);
+            // В случае ошибки показываем экран "В разработке"
+            comingSoonScreen.style.display = 'flex';
+            appContainer.style.display = 'none';
+            initComingSoonScreen();
         }
-        
-        // Проверка роли пользователя
-        if (currentUser.role !== 2) { // Если не админ
-            showComingSoonScreen();
-            return;
-        }
-        
-        // Обновление UI с данными пользователя
-        updateUserUI(currentUser);
-
-        
-        // Загрузка баланса
-        await loadUserBalance();
-        
-        // Загрузка инвентаря
-        await loadInventory();
-
-        // Инициализация кейсов
-        await initCases();
-
-        // Загрузка истории операций
-        await loadTransactions();
+    } else {
+        // Если нет данных пользователя (например, открыто в браузере)
+        comingSoonScreen.style.display = 'flex';
+        appContainer.style.display = 'none';
+        initComingSoonScreen();
     }
-    
-    // Инициализация вкладок
-    initTabs();
-    
-    // Инициализация модальных окон
-    initModals();
-    
-    // Инициализация кнопок
-    initButtons();
-
-    // Инициализация рулетки бонусов
-    initRoulette();
 });
+
+function initComingSoonScreen() {
+    const comingSoonContent = document.querySelector('.coming-soon-content');
+    
+    // Устанавливаем содержимое экрана
+    comingSoonContent.innerHTML = `
+        <div class="logo">
+            <i class="fas fa-gift"></i>
+            <span>GiftRush</span>
+        </div>
+        <h1>Скоро запуск!</h1>
+        <p>Мы активно работаем над проектом, чтобы сделать его еще лучше для вас.</p>
+        <div class="progress-container">
+            <div class="progress-bar" style="width: 75%"></div>
+            <span>75% готово</span>
+        </div>
+        <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <h3>Уникальные кейсы</h3>
+                        <p>Эксклюзивные предметы и награды</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <h3>Подарки и бонусы</h3>
+                        <p>Выигрывайте и выводите</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3>Реферальная система</h3>
+                        <p>Приглашайте друзей и получайте награды</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <h3>Достижения</h3>
+                        <p>Разблокируйте уникальные награды</p>
+                    </div>
+                </div>
+        <div class="countdown">
+            <h3>До запуска осталось:</h3>
+            <div class="timer">
+                <div class="time-block">
+                    <span class="days">07</span>
+                    <span class="label">Дней</span>
+                </div>
+                <div class="time-block">
+                    <span class="hours">12</span>
+                    <span class="label">Часов</span>
+                </div>
+                <div class="time-block">
+                    <span class="minutes">45</span>
+                    <span class="label">Минут</span>
+                </div>
+            </div>
+        </div>
+        <div class="tg-channel">
+            <p>Подпишитесь на наш Telegram-канал, чтобы быть в курсе новостей:</p>
+            <a href="https://t.me/giftrushofficial" class="tg-channel-btn" target="_blank">
+                <i class="fab fa-telegram"></i> GiftRush Official
+            </a>
+        </div>
+    `;
+    
+    // Запускаем таймер
+    updateCountdown();
+}
 
 // Функция для показа экрана "В разработке"
 function showComingSoonScreen() {
@@ -98,8 +173,8 @@ function showComingSoonScreen() {
                         <div class="feature-icon">
                             <i class="fas fa-coins"></i>
                         </div>
-                        <h3>Монеты и бонусы</h3>
-                        <p>Зарабатывайте и выводите</p>
+                        <h3>Подарки и бонусы</h3>
+                        <p>Выигрывайте и выводите</p>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">
