@@ -51,6 +51,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await loadInventory();
                 await initCases();
                 await loadTransactions();
+                
+                // Добавьте эти строки:
+                initTabs();
+                initModals();
+                initButtons();
+                initRoulette();
             } else { // Для обычных пользователей
                 comingSoonScreen.style.display = 'flex';
                 initComingSoonScreen();
@@ -698,21 +704,22 @@ function initTabs() {
 
 // Функция для инициализации модальных окон
 function initModals() {
-    // Модальное окно пополнения баланса (новое)
+    // Модальное окно пополнения баланса
     const depositModal = document.getElementById('deposit-modal');
     const addBalanceBtn = document.getElementById('add-balance-btn');
     const closeDepositModal = document.getElementById('close-deposit-modal');
     
-    addBalanceBtn.addEventListener('click', () => {
-        depositModal.classList.add('active');
-        resetDepositForm();
-    });
+    if (addBalanceBtn && depositModal && closeDepositModal) {
+        addBalanceBtn.addEventListener('click', () => {
+            depositModal.classList.add('active');
+            resetDepositForm();
+        });
+        
+        closeDepositModal.addEventListener('click', () => {
+            depositModal.classList.remove('active');
+        });
+    }
     
-    closeDepositModal.addEventListener('click', () => {
-        depositModal.classList.remove('active');
-    });
-    
-    // Добавьте новые обработчики для вкладок и ввода суммы
     initDepositTabs();
     initDepositInputs();
     
@@ -720,25 +727,36 @@ function initModals() {
     const itemModal = document.getElementById('item-modal');
     const closeItemModal = document.getElementById('close-item-modal');
     
-    closeItemModal.addEventListener('click', () => {
-        itemModal.classList.remove('active');
-    });
+    if (itemModal && closeItemModal) {
+        closeItemModal.addEventListener('click', () => {
+            itemModal.classList.remove('active');
+        });
+    }
     
     // Модальное окно информации о шансах
     const chanceModal = document.getElementById('chance-modal');
     const closeChanceModal = document.getElementById('close-chance-modal');
     
-    closeChanceModal.addEventListener('click', () => {
-        chanceModal.classList.remove('active');
-    });
+    if (chanceModal && closeChanceModal) {
+        closeChanceModal.addEventListener('click', () => {
+            chanceModal.classList.remove('active');
+        });
+    }
     
     // Модальное окно создания промокода
     const createPromoModal = document.getElementById('create-promo-modal');
     const closeCreatePromoModal = document.getElementById('close-create-promo-modal');
+    const createPromoBtn = document.getElementById('create-promo-btn');
     
-    closeCreatePromoModal.addEventListener('click', () => {
-        createPromoModal.classList.remove('active');
-    });
+    if (createPromoBtn && createPromoModal && closeCreatePromoModal) {
+        createPromoBtn.addEventListener('click', () => {
+            createPromoModal.classList.add('active');
+        });
+        
+        closeCreatePromoModal.addEventListener('click', () => {
+            createPromoModal.classList.remove('active');
+        });
+    }
     
     // Закрытие модальных окон при клике вне контента
     document.querySelectorAll('.modal').forEach(modal => {
@@ -839,42 +857,50 @@ function resetDepositForm() {
 // Функция для инициализации кнопок
 function initButtons() {
     // Кнопка подтверждения пополнения баланса
-    document.getElementById('confirm-deposit-btn').addEventListener('click', () => {
-        const selectedAmount = document.querySelector('input[name="deposit-amount"]:checked')?.value;
-        if (selectedAmount) {
-            processDeposit(parseInt(selectedAmount));
-        } else {
-            showNotification('Пожалуйста, выберите сумму');
-        }
-    });
+    const confirmDepositBtn = document.getElementById('confirm-deposit-btn');
+    if (confirmDepositBtn) {
+        confirmDepositBtn.addEventListener('click', processDeposit);
+    }
     
     // Кнопка копирования реферальной ссылки
-    document.getElementById('copy-link-btn').addEventListener('click', () => {
-        const referralLink = document.getElementById('referral-link');
-        referralLink.select();
-        document.execCommand('copy');
-        showNotification('Ссылка скопирована в буфер обмена');
-    });
+    const copyLinkBtn = document.getElementById('copy-link-btn');
+    if (copyLinkBtn) {
+        copyLinkBtn.addEventListener('click', () => {
+            const referralLink = document.getElementById('referral-link');
+            referralLink.select();
+            document.execCommand('copy');
+            showNotification('Ссылка скопирована в буфер обмена');
+        });
+    }
     
-    // Кнопка активации промокода
-    document.getElementById('apply-promo-btn').addEventListener('click', () => {
-        const promoCode = document.getElementById('promo-input').value.trim();
-        if (promoCode) {
-            applyPromoCode(promoCode);
-        } else {
-            showNotification('Пожалуйста, введите промокод');
-        }
-    });
+    // Кнопка активации промокода (в разделе бонусов)
+    const applyPromoBtn = document.getElementById('apply-promo-btn');
+    if (applyPromoBtn) {
+        applyPromoBtn.addEventListener('click', () => {
+            const promoCode = document.getElementById('promo-input').value.trim();
+            if (promoCode) {
+                applyPromoCode(promoCode);
+            } else {
+                showNotification('Пожалуйста, введите промокод');
+            }
+        });
+    }
     
     // Кнопка создания промокода
-    document.getElementById('create-promo-btn').addEventListener('click', () => {
-        createPromoCode();
-    });
+    const createPromoBtn = document.getElementById('create-promo-btn');
+    if (createPromoBtn) {
+        createPromoBtn.addEventListener('click', () => {
+            document.getElementById('create-promo-modal').classList.add('active');
+        });
+    }
     
     // Кнопка "Показать еще" в истории операций
-    document.querySelector('.show-more-btn')?.addEventListener('click', async () => {
-        await loadMoreTransactions();
-    });
+    const showMoreBtn = document.querySelector('.show-more-btn');
+    if (showMoreBtn) {
+        showMoreBtn.addEventListener('click', async () => {
+            await loadMoreTransactions();
+        });
+    }
     
     // Кнопки фильтров инвентаря
     document.querySelectorAll('.inv-filter').forEach(btn => {
