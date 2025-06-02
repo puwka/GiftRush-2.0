@@ -11,9 +11,35 @@
 </head>
 <body>
     <!-- Экран "В разработке" - показывается сразу -->
-    <div id="coming-soon-screen" class="coming-soon-container" style="display: none;">
+    <div id="coming-soon-screen" class="coming-soon-container">
         <div class="coming-soon-content">
             <!-- Содержимое экрана "В разработке" -->
+        </div>
+    </div>
+
+    <!-- Добавьте этот код в index.html перед app-container -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <!-- Анимированный логотип -->
+            <div class="loading-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <div class="logo-text">GiftRush</div>
+            </div>
+            
+            <!-- Прогресс бар с анимацией -->
+            <div class="loading-progress">
+                <div class="progress-bar"></div>
+                <div class="progress-text">Загрузка...</div>
+            </div>
+            
+            <!-- Красивые анимированные элементы -->
+            <div class="loading-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
         </div>
     </div>
 

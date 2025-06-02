@@ -18,65 +18,64 @@ if (typeof window.supabase === 'undefined') {
 }
 
 // Инициализация приложения
+// Обновите код в app.js (в начале функции DOMContentLoaded)
 document.addEventListener('DOMContentLoaded', async () => {
-    // Сначала показываем экран "В разработке"
+    // Показываем экран загрузки
+    const loadingScreen = document.getElementById('loading-screen');
     const comingSoonScreen = document.getElementById('coming-soon-screen');
     const appContainer = document.querySelector('.app-container');
     
+    // Скрываем все остальные экраны
+    comingSoonScreen.style.display = 'none';
+    appContainer.style.display = 'none';
+    
     // Инициализация Telegram WebApp
-    tg.expand();
-    tg.enableClosingConfirmation();
-    
-    // Получение данных пользователя из Telegram
-    const tgUser = tg.initDataUnsafe?.user;
-    
+    if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.expand();
+        window.Telegram.WebApp.enableClosingConfirmation();
+    }
+
+    // Проверяем пользователя (если есть)
+    const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
     if (tgUser) {
         try {
-            // Проверка или создание пользователя в БД
             currentUser = await getUserOrCreate(tgUser);
             
-            if (!currentUser) {
-                showNotification('Ошибка загрузки профиля');
-                return;
-            }
+            // Скрываем экран загрузки с анимацией
+            loadingScreen.classList.add('hidden');
             
-            // Проверка роли пользователя
-            if (currentUser.role === 2) { // Если админ
-                comingSoonScreen.style.display = 'none';
-                appContainer.style.display = 'flex'; // Показываем основное приложение
-                
-                // Инициализация приложения для админа
+            if (currentUser?.role === 2) { // Для админов
+                appContainer.style.display = 'flex';
                 updateUserUI(currentUser);
                 await loadUserBalance();
                 await loadInventory();
                 await initCases();
                 await loadTransactions();
-            } else {
-                // Для обычных пользователей показываем экран "В разработке"
+            } else { // Для обычных пользователей
                 comingSoonScreen.style.display = 'flex';
-                appContainer.style.display = 'none';
                 initComingSoonScreen();
             }
         } catch (error) {
-            console.error('Error during initialization:', error);
-            // В случае ошибки показываем экран "В разработке"
+            console.error('Initialization error:', error);
+            loadingScreen.classList.add('hidden');
             comingSoonScreen.style.display = 'flex';
-            appContainer.style.display = 'none';
             initComingSoonScreen();
         }
     } else {
-        // Если нет данных пользователя (например, открыто в браузере)
+        // Если нет пользователя Telegram
+        loadingScreen.classList.add('hidden');
         comingSoonScreen.style.display = 'flex';
-        appContainer.style.display = 'none';
         initComingSoonScreen();
     }
+    
+    // Удаляем экран загрузки после анимации
+    setTimeout(() => {
+        loadingScreen.style.display = 'none';
+    }, 500);
 });
 
 function initComingSoonScreen() {
-    const comingSoonContent = document.querySelector('.coming-soon-content');
-    
-    // Устанавливаем содержимое экрана
-    comingSoonContent.innerHTML = `
+    const content = `
         <div class="logo">
             <i class="fas fa-gift"></i>
             <span>GiftRush</span>
@@ -142,82 +141,7 @@ function initComingSoonScreen() {
         </div>
     `;
     
-    // Запускаем таймер
-    updateCountdown();
-}
-
-// Функция для показа экрана "В разработке"
-function showComingSoonScreen() {
-    document.body.innerHTML = `
-        <div class="coming-soon-container">
-            <div class="coming-soon-content">
-                <div class="logo">
-                    <i class="fas fa-gift"></i>
-                    <span>GiftRush</span>
-                </div>
-                <h1>Скоро запуск!</h1>
-                <p>Мы активно работаем над проектом, чтобы сделать его еще лучше для вас.</p>
-                <div class="progress-container">
-                    <div class="progress-bar" style="width: 75%"></div>
-                    <span>75% готово</span>
-                </div>
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-box-open"></i>
-                        </div>
-                        <h3>Уникальные кейсы</h3>
-                        <p>Эксклюзивные предметы и награды</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-coins"></i>
-                        </div>
-                        <h3>Подарки и бонусы</h3>
-                        <p>Выигрывайте и выводите</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <h3>Реферальная система</h3>
-                        <p>Приглашайте друзей и получайте награды</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-trophy"></i>
-                        </div>
-                        <h3>Достижения</h3>
-                        <p>Разблокируйте уникальные награды</p>
-                    </div>
-                </div>
-                <div class="countdown">
-                    <h3>До запуска осталось:</h3>
-                    <div class="timer">
-                        <div class="time-block">
-                            <span class="days">07</span>
-                            <span class="label">Дней</span>
-                        </div>
-                        <div class="time-block">
-                            <span class="hours">12</span>
-                            <span class="label">Часов</span>
-                        </div>
-                        <div class="time-block">
-                            <span class="minutes">45</span>
-                            <span class="label">Минут</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="social-links">
-                    <a href="#" class="social-link"><i class="fab fa-telegram"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                </div>
-            </div>
-        </div>
-    `;
-
-    // Запускаем таймер
+    document.querySelector('.coming-soon-content').innerHTML = content;
     updateCountdown();
 }
 
