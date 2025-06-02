@@ -65,6 +65,7 @@
                 <!-- Баннер с акцией -->
                 <div class="case-banner premium">
                     <div class="banner-content">
+                        <div class="banner-badge">Акция</div>
                         <h3>ОГНЕННЫЕ КЕЙСЫ</h3>
                         <p>Ограниченная коллекция с эксклюзивными предметами</p>
                         <div class="banner-timer">
@@ -73,82 +74,78 @@
                         </div>
                     </div>
                     <div class="banner-image"></div>
+                    <div class="banner-overlay"></div>
                 </div>
                 
                 <!-- Фильтры кейсов -->
-                <div class="case-filters">
-                    <button class="filter-btn active" data-filter="all">
-                        <i class="fas fa-layer-group"></i> Все
-                    </button>
-                    <button class="filter-btn" data-filter="common">
-                        <i class="fas fa-box"></i> Обычные
-                    </button>
-                    <button class="filter-btn" data-filter="uncommon">
-                        <i class="fas fa-leaf"></i> Необычные
-                    </button>
-                    <button class="filter-btn" data-filter="rare">
-                        <i class="fas fa-gem"></i> Редкие
-                    </button>
-                    <button class="filter-btn" data-filter="epic">
-                        <i class="fas fa-bolt"></i> Эпические
-                    </button>
-                    <button class="filter-btn" data-filter="legendary">
-                        <i class="fas fa-crown"></i> Легендарные
-                    </button>
-                </div>
-                
-                <!-- Список кейсов -->
-                <div class="cases-container">
-                    <!-- Кейсы будут загружаться из БД через JS -->
-                    <div class="case-loading">
-                        <div class="loading-spinner"></div>
-                        <p>Загрузка кейсов...</p>
+                <div class="case-filters-container">
+                    <div class="case-filters-scroll">
+                        <div class="case-filters">
+                            <button class="filter-btn active" data-filter="all">
+                                <i class="fas fa-layer-group"></i> Все
+                            </button>
+                            <button class="filter-btn" data-filter="common">
+                                <i class="fas fa-box"></i> Обычные
+                            </button>
+                            <button class="filter-btn" data-filter="uncommon">
+                                <i class="fas fa-leaf"></i> Необычные
+                            </button>
+                            <button class="filter-btn" data-filter="rare">
+                                <i class="fas fa-gem"></i> Редкие
+                            </button>
+                            <button class="filter-btn" data-filter="epic">
+                                <i class="fas fa-bolt"></i> Эпические
+                            </button>
+                            <button class="filter-btn" data-filter="legendary">
+                                <i class="fas fa-crown"></i> Легендарные
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
-                <!-- Категории кейсов -->
-                <div class="case-categories">
-                    <h3 class="categories-title">Коллекции</h3>
-                    <div class="categories-grid">
-                        <div class="category-card" data-category="popular">
-                            <div class="category-icon">
-                                <i class="fas fa-fire"></i>
-                            </div>
-                            <div class="category-info">
-                                <h4>Популярные</h4>
-                                <p>Топовые кейсы</p>
-                            </div>
-                            <div class="category-badge">24</div>
+                <!-- Список кейсов -->
+                <div class="cases-container-wrapper">
+                    <div class="cases-container">
+                        <!-- Кейсы будут загружаться из БД через JS -->
+                        <div class="case-loading">
+                            <div class="loading-spinner"></div>
+                            <p>Загрузка кейсов...</p>
                         </div>
-                        <div class="category-card" data-category="new">
-                            <div class="category-icon">
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <div class="category-info">
-                                <h4>Новые</h4>
-                                <p>Свежие поступления</p>
-                            </div>
-                            <div class="category-badge">12</div>
+                    </div>
+                </div>
+                
+                <!-- Статистика кейсов -->
+                <div class="case-stats-container">
+                    <div class="case-stats-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
                         </div>
-                        <div class="category-card" data-category="discount">
-                            <div class="category-icon">
-                                <i class="fas fa-percent"></i>
-                            </div>
-                            <div class="category-info">
-                                <h4>Скидки</h4>
-                                <p>Выгодные предложения</p>
-                            </div>
-                            <div class="category-badge">8</div>
+                        <div class="stat-content">
+                            <h3>Игроков онлайн</h3>
+                            <div class="stat-value" id="online-users">1,245</div>
+                            <div class="stat-label">+15 за час</div>
                         </div>
-                        <div class="category-card" data-category="premium">
-                            <div class="category-icon">
-                                <i class="fas fa-crown"></i>
-                            </div>
-                            <div class="category-info">
-                                <h4>Премиум</h4>
-                                <p>Элитные кейсы</p>
-                            </div>
-                            <div class="category-badge">5</div>
+                    </div>
+                    
+                    <div class="case-stats-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Открыто кейсов</h3>
+                            <div class="stat-value" id="opened-cases">24,876</div>
+                            <div class="stat-label">+328 сегодня</div>
+                        </div>
+                    </div>
+                    
+                    <div class="case-stats-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-gem"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Редких предметов</h3>
+                            <div class="stat-value" id="rare-items">1,245</div>
+                            <div class="stat-label">Выпало сегодня</div>
                         </div>
                     </div>
                 </div>
