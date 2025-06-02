@@ -35,8 +35,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         
+        // Проверка роли пользователя
+        if (currentUser.role !== 2) { // Если не админ
+            showComingSoonScreen();
+            return;
+        }
+        
         // Обновление UI с данными пользователя
         updateUserUI(currentUser);
+
         
         // Загрузка баланса
         await loadUserBalance();
@@ -63,6 +70,81 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Инициализация рулетки бонусов
     initRoulette();
 });
+
+// Функция для показа экрана "В разработке"
+function showComingSoonScreen() {
+    document.body.innerHTML = `
+        <div class="coming-soon-container">
+            <div class="coming-soon-content">
+                <div class="logo">
+                    <i class="fas fa-gift"></i>
+                    <span>GiftRush</span>
+                </div>
+                <h1>Скоро запуск!</h1>
+                <p>Мы активно работаем над проектом, чтобы сделать его еще лучше для вас.</p>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 75%"></div>
+                    <span>75% готово</span>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <h3>Уникальные кейсы</h3>
+                        <p>Эксклюзивные предметы и награды</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <h3>Монеты и бонусы</h3>
+                        <p>Зарабатывайте и выводите</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3>Реферальная система</h3>
+                        <p>Приглашайте друзей и получайте награды</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <h3>Достижения</h3>
+                        <p>Разблокируйте уникальные награды</p>
+                    </div>
+                </div>
+                <div class="countdown">
+                    <h3>До запуска осталось:</h3>
+                    <div class="timer">
+                        <div class="time-block">
+                            <span class="days">07</span>
+                            <span class="label">Дней</span>
+                        </div>
+                        <div class="time-block">
+                            <span class="hours">12</span>
+                            <span class="label">Часов</span>
+                        </div>
+                        <div class="time-block">
+                            <span class="minutes">45</span>
+                            <span class="label">Минут</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-telegram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Запускаем таймер
+    updateCountdown();
+}
 
 // Функция для получения или создания пользователя
 async function getUserOrCreate(tgUser) {
@@ -94,7 +176,8 @@ async function getUserOrCreate(tgUser) {
                 referrals_count: 0,
                 referral_code: generateReferralCode(),
                 created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
+                updated_at: new Date().toISOString(),
+                role: 1 // По умолчанию обычный пользователь
             }])
             .select()
             .single();
@@ -1530,6 +1613,35 @@ function openCasePage(caseId) {
     
     // Перенаправляем на страницу кейса
     window.location.href = 'case.html';
+}
+
+// Функция для обновления таймера
+function updateCountdown() {
+    // Установите дату запуска проекта (например, через 7 дней)
+    const launchDate = new Date();
+    launchDate.setDate(launchDate.getDate() + 7);
+    
+    const timer = setInterval(() => {
+        const now = new Date();
+        const distance = launchDate - now;
+        
+        if (distance < 0) {
+            clearInterval(timer);
+            return;
+        }
+        
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        
+        const daysElement = document.querySelector('.days');
+        const hoursElement = document.querySelector('.hours');
+        const minutesElement = document.querySelector('.minutes');
+        
+        if (daysElement) daysElement.textContent = days.toString().padStart(2, '0');
+        if (hoursElement) hoursElement.textContent = hours.toString().padStart(2, '0');
+        if (minutesElement) minutesElement.textContent = minutes.toString().padStart(2, '0');
+    }, 1000);
 }
 
 // Функция для показа уведомлений
