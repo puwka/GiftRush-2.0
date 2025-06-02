@@ -505,7 +505,7 @@ body {
     color: var(--secondary-color);
 }
 
-.stat-value {
+.stat-value-user {
     font-size: 1.1rem;
     font-weight: 700;
     color: white;
@@ -645,7 +645,7 @@ body {
     text-align: center;
 }
 
-.stat-value {
+.stat-value-bonus {
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--accent-color);
