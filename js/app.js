@@ -83,7 +83,7 @@ function initComingSoonScreen() {
         <h1>Скоро запуск!</h1>
         <p>Мы активно работаем над проектом, чтобы сделать его еще лучше для вас.</p>
         <div class="progress-container">
-            <div class="progress-bar" style="width: 75%"></div>
+            <div class="progress-bar-open" style="width: 75%"></div>
             <span>75% готово</span>
         </div>
         <div class="features-grid">

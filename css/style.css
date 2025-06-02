@@ -2879,7 +2879,7 @@ body {
     overflow: hidden;
 }
 
-.progress-bar {
+.progress-bar-open {
     height: 100%;
     background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
     border-radius: 10px;
