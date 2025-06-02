@@ -730,93 +730,6 @@ body {
     background-color: rgba(253, 121, 168, 0.1);
 }
 
-/* Стили для вкладки Апгрейд */
-.upgrade-container {
-    margin-top: 10px;
-}
-
-.upgrade-card {
-    background-color: var(--dark-color);
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-}
-
-.upgrade-icon {
-    width: 50px;
-    height: 50px;
-    background-color: rgba(108, 92, 231, 0.2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 15px;
-    color: var(--primary-color);
-    font-size: 1.2rem;
-}
-
-.upgrade-info {
-    flex: 1;
-}
-
-.upgrade-info h3 {
-    font-size: 1rem;
-    margin-bottom: 5px;
-}
-
-.progress-container {
-    height: 6px;
-    background-color: rgba(0, 0, 0, 0.3);
-    border-radius: 3px;
-    margin: 8px 0;
-    overflow: hidden;
-}
-
-.progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
-    border-radius: 3px;
-}
-
-.upgrade-levels {
-    display: flex;
-    margin: 10px 0;
-}
-
-.upgrade-levels .level {
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    background-color: rgba(0, 0, 0, 0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 5px;
-    font-size: 0.7rem;
-}
-
-.upgrade-levels .level.active {
-    background-color: var(--success-color);
-    color: white;
-}
-
-.upgrade-btn {
-    background-color: var(--primary-color);
-    border: none;
-    color: white;
-    padding: 8px 15px;
-    border-radius: 6px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.upgrade-btn:hover {
-    background-color: var(--secondary-color);
-}
-
 /* Общие стили для секций профиля */
 .profile-section {
     background-color: var(--dark-color);
@@ -983,7 +896,7 @@ body {
     overflow: hidden;
 }
 
-.progress-bar {
+.progress-bar-profile {
     height: 100%;
     background: linear-gradient(90deg, var(--accent-color), #ff7675);
     border-radius: 3px;
