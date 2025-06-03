@@ -111,109 +111,102 @@ body {
 
 /* В style.css (обновленные стили для вкладки Кейсы) */
 
-/* Стили для охотничьего баннера */
-.hunter-case-banner {
+/* Обновленные стили для баннера в style.css */
+.case-banner {
     position: relative;
-    height: 260px;
-    border-radius: 20px;
+    border-radius: 25px;
     overflow: hidden;
-    margin: 20px 0;
-    padding: 30px;
+    margin: 20px 15px;
+    height: 220px;
     display: flex;
     align-items: center;
-    background: linear-gradient(135deg, #3a5f0b, #6b8e23);
-    box-shadow: 0 15px 40px rgba(58, 95, 11, 0.5);
+    padding: 30px;
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.9), rgba(253, 121, 168, 0.8));
+    box-shadow: 0 15px 40px rgba(108, 92, 231, 0.4);
+    transition: all 0.4s cubic-bezier(0.3, 0, 0, 1);
+    z-index: 1;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;
-    font-family: 'Inter', sans-serif;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.hunter-case-banner:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 50px rgba(58, 95, 11, 0.7);
+.case-banner:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 50px rgba(108, 92, 231, 0.6);
 }
 
-/* Бейдж */
-.case-badge {
+.case-banner.premium {
+    background: linear-gradient(135deg, #6c5ce7, #fd79a8);
+}
+
+.banner-content {
+    position: relative;
+    z-index: 3;
+    width: 60%;
+}
+
+.banner-badge {
     position: relative;
     display: inline-block;
-    background: linear-gradient(90deg, #8b4513, #a0522d);
-    padding: 8px 20px;
+    background: linear-gradient(90deg, #ff4757, #ff6b81);
+    color: white;
+    padding: 6px 15px;
     border-radius: 30px;
+    font-size: 0.75rem;
     font-weight: 700;
-    font-size: 0.85rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(255, 107, 129, 0.4);
     margin-bottom: 20px;
-    box-shadow: 0 4px 15px rgba(139, 69, 19, 0.5);
-    z-index: 2;
     animation: pulse 2s infinite;
 }
 
-.badge-text {
+.banner-badge span {
     position: relative;
     z-index: 2;
 }
 
-.badge-glow {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, rgba(255,215,0,0) 70%);
-    border-radius: 30px;
-    z-index: 1;
-}
-
-/* Заголовок */
-.case-title {
-    font-size: 2.5rem;
+.banner-content h3 {
+    font-size: 2rem;
+    margin-bottom: 12px;
+    color: white;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    line-height: 1.2;
     font-weight: 800;
-    margin-bottom: 15px;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    background: linear-gradient(to right, #f5f5dc, #f5deb3);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
 }
 
-/* Описание */
-.case-description {
-    font-size: 1.1rem;
-    margin-bottom: 25px;
-    max-width: 60%;
-    line-height: 1.5;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+.banner-content p {
+    font-size: 1.05rem;
     opacity: 0.9;
+    margin-bottom: 25px;
+    color: white;
+    line-height: 1.5;
+    max-width: 90%;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-/* Таймер */
-.case-timer {
+.banner-timer {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
     background: rgba(0, 0, 0, 0.3);
-    padding: 12px 20px;
+    padding: 12px 18px;
     border-radius: 15px;
+    width: fit-content;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 25px;
-    width: fit-content;
+    margin-bottom: 20px;
 }
 
 .timer-icon {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #daa520, #f5deb3);
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #fdcb6e, #ffeaa7);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #3a5f0b;
-    font-size: 1.1rem;
-    box-shadow: 0 4px 10px rgba(218, 165, 32, 0.4);
+    color: #2d3436;
+    font-size: 1rem;
+    box-shadow: 0 4px 10px rgba(253, 203, 110, 0.4);
 }
 
 .timer-text {
@@ -221,66 +214,76 @@ body {
     flex-direction: column;
 }
 
-.timer-label {
-    font-size: 0.85rem;
+.timer-text span {
+    font-size: 0.8rem;
     opacity: 0.8;
+    color: white;
 }
 
 .timer-value {
     font-weight: 700;
-    font-size: 1.3rem;
+    color: #fdcb6e;
+    font-size: 1.2rem;
     letter-spacing: 1px;
-    color: #daa520;
 }
 
-/* Кнопка */
-.open-case-btn {
-    background: linear-gradient(135deg, #daa520, #f5deb3);
-    color: #3a5f0b;
+.banner-button {
+    background: white;
+    color: var(--primary-color);
     border: none;
-    padding: 14px 30px;
+    padding: 12px 25px;
     border-radius: 30px;
     font-weight: 700;
     font-size: 1rem;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s;
     display: flex;
     align-items: center;
     gap: 10px;
-    box-shadow: 0 5px 20px rgba(218, 165, 32, 0.4);
+    box-shadow: 0 5px 20px rgba(255, 255, 255, 0.3);
     z-index: 2;
     position: relative;
 }
 
-.open-case-btn:hover {
+.banner-button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(218, 165, 32, 0.6);
+    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.4);
+    background: #f5f6fa;
 }
 
-.open-case-btn i {
-    transition: transform 0.3s ease;
+.banner-button i {
+    transition: transform 0.3s;
 }
 
-.open-case-btn:hover i {
+.banner-button:hover i {
     transform: translateX(5px);
 }
 
-/* Изображение */
-.case-image {
+.banner-image {
     position: absolute;
     right: 0;
     top: 0;
     bottom: 0;
     width: 45%;
+    background-image: url('https://images.giftsbattle.com/case/ot5kdep.webp');
     background-size: contain;
     background-position: right center;
     background-repeat: no-repeat;
-    z-index: 1;
-    filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.5));
+    z-index: 2;
+    filter: drop-shadow(0 0 20px rgba(253, 121, 168, 0.5));
 }
 
-/* Эффекты */
-.banner-effects {
+.banner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, rgba(30, 39, 46, 0.7) 0%, rgba(30, 39, 46, 0.2) 100%);
+    z-index: 1;
+}
+
+.banner-particles {
     position: absolute;
     top: 0;
     left: 0;
@@ -290,102 +293,144 @@ body {
     z-index: 0;
 }
 
-.effect-glow {
-    position: absolute;
-    width: 200px;
-    height: 200px;
-    background: radial-gradient(circle, rgba(218, 165, 32, 0.4) 0%, rgba(218, 165, 32, 0) 70%);
-    top: -50px;
-    right: -50px;
-    filter: blur(20px);
-}
-
-.effect-particles .particle {
+.particle {
     position: absolute;
     background: rgba(255, 255, 255, 0.6);
     border-radius: 50%;
     animation: float 15s infinite linear;
 }
 
-.effect-particles .particle:nth-child(1) {
-    width: 6px;
-    height: 6px;
+.particle:nth-child(1) {
+    width: 5px;
+    height: 5px;
     top: 20%;
-    left: 15%;
+    left: 10%;
     animation-delay: 0s;
 }
 
-.effect-particles .particle:nth-child(2) {
-    width: 4px;
-    height: 4px;
+.particle:nth-child(2) {
+    width: 8px;
+    height: 8px;
     top: 60%;
-    left: 30%;
-    animation-delay: 3s;
+    left: 25%;
+    animation-delay: 2s;
 }
 
-.effect-particles .particle:nth-child(3) {
-    width: 5px;
-    height: 5px;
+.particle:nth-child(3) {
+    width: 4px;
+    height: 4px;
     top: 40%;
+    left: 50%;
+    animation-delay: 4s;
+}
+
+.particle:nth-child(4) {
+    width: 6px;
+    height: 6px;
+    top: 70%;
     left: 70%;
     animation-delay: 6s;
 }
 
-/* Анимации */
-@keyframes pulse {
-    0% { transform: scale(1); box-shadow: 0 4px 15px rgba(139, 69, 19, 0.5); }
-    50% { transform: scale(1.05); box-shadow: 0 6px 20px rgba(139, 69, 19, 0.7); }
-    100% { transform: scale(1); box-shadow: 0 4px 15px rgba(139, 69, 19, 0.5); }
+.particle:nth-child(5) {
+    width: 3px;
+    height: 3px;
+    top: 30%;
+    left: 80%;
+    animation-delay: 8s;
+}
+
+.banner-glow {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(253, 121, 168, 0.6) 0%, rgba(253, 121, 168, 0) 70%);
+    top: -50px;
+    right: -50px;
+    z-index: 0;
+    filter: blur(20px);
 }
 
 @keyframes float {
-    0% { transform: translateY(0) translateX(0); opacity: 0; }
-    50% { opacity: 0.8; }
-    100% { transform: translateY(-100px) translateX(50px); opacity: 0; }
+    0% {
+        transform: translateY(0) translateX(0);
+        opacity: 0;
+    }
+    50% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-100px) translateX(50px);
+        opacity: 0;
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 4px 15px rgba(255, 107, 129, 0.4);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(255, 107, 129, 0.6);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 4px 15px rgba(255, 107, 129, 0.4);
+    }
 }
 
 /* Адаптивность */
 @media (max-width: 768px) {
-    .hunter-case-banner {
-        height: 220px;
+    .case-banner {
+        height: 200px;
         padding: 25px;
     }
     
-    .case-title {
-        font-size: 2rem;
+    .banner-content h3 {
+        font-size: 1.7rem;
     }
     
-    .case-description {
-        font-size: 1rem;
-        max-width: 70%;
+    .banner-content p {
+        font-size: 0.95rem;
+        max-width: 100%;
     }
     
-    .case-image {
+    .banner-image {
+        width: 50%;
         opacity: 0.7;
     }
 }
 
 @media (max-width: 500px) {
-    .hunter-case-banner {
-        height: 200px;
+    .case-banner {
+        height: 180px;
         padding: 20px;
+        margin: 15px 10px;
+    }
+    
+    .banner-content {
+        width: 100%;
         text-align: center;
     }
     
-    .case-title {
-        font-size: 1.8rem;
+    .banner-content h3 {
+        font-size: 1.5rem;
     }
     
-    .case-description {
-        max-width: 100%;
-        margin: 0 auto 20px;
+    .banner-content p {
+        margin-bottom: 15px;
     }
     
-    .case-timer {
-        margin: 0 auto 20px;
+    .banner-timer {
+        margin: 0 auto 15px;
     }
     
-    .case-image {
+    .banner-button {
+        margin: 0 auto;
+    }
+    
+    .banner-image {
         display: none;
     }
 }
