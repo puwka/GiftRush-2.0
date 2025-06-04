@@ -293,6 +293,13 @@ function initUI() {
     document.querySelector('.open-option[data-count="1"]').classList.add('active');
 }
 
+// Добавьте новую функцию
+function updateOpenButton() {
+    const totalPrice = caseData.price * selectedCount;
+    document.getElementById('open-count').textContent = selectedCount;
+    document.getElementById('open-price').textContent = totalPrice;
+}
+
 // Функция для инициализации обработчиков событий
 function initEventListeners() {
     // Кнопка "Назад"
@@ -306,24 +313,14 @@ function initEventListeners() {
     
     options.forEach(btn => {
         btn.addEventListener('click', () => {
-            // Удаляем активный класс у всех кнопок
             options.forEach(b => b.classList.remove('active'));
-            
-            // Добавляем активный класс текущей кнопке
             btn.classList.add('active');
             
-            // Обновляем выделение
             const index = Array.from(options).indexOf(btn);
             highlight.style.transform = `translateX(${index * 100}%)`;
             
-            // Сохраняем выбранное количество
             selectedCount = parseInt(btn.getAttribute('data-count'));
-            
-            // Обновляем текст кнопки открытия
-            const openBtn = document.getElementById('open-case-btn');
-            openBtn.innerHTML = `
-                <i class="fas fa-gift"></i> Открыть ${selectedCount}x (${caseData.price * selectedCount} <i class="fas fa-coins"></i>)
-            `;
+            updateOpenButton();
         });
     });
     
@@ -346,6 +343,20 @@ function initEventListeners() {
     document.getElementById('sell-item-btn').addEventListener('click', sellWonItem);
     document.getElementById('keep-item-btn').addEventListener('click', keepWonItem);
     document.getElementById('open-again-btn').addEventListener('click', openAgain);
+
+    document.getElementById('demo-toggle').addEventListener('click', toggleDemoMode);
+}
+
+// Добавьте новую функцию
+function toggleDemoMode() {
+    const toggle = document.getElementById('demo-toggle');
+    toggle.classList.toggle('active');
+    const isDemo = toggle.classList.contains('active');
+    
+    // Здесь можно добавить логику для демо-режима
+    if (isDemo) {
+        showNotification('Демо-режим включен. Вы можете тестировать открытие кейсов без списания средств.');
+    }
 }
 
 // Функция для открытия кейса
@@ -354,9 +365,10 @@ async function openCase() {
     
     const openBtn = document.getElementById('open-case-btn');
     const totalPrice = caseData.price * selectedCount;
+    const isDemo = document.getElementById('demo-toggle').classList.contains('active');
     
-    // Проверяем баланс
-    if (userBalance < totalPrice) {
+    // Проверяем баланс (если не демо-режим)
+    if (!isDemo && userBalance < totalPrice) {
         showNotification('Недостаточно средств');
         return;
     }
@@ -364,36 +376,62 @@ async function openCase() {
     try {
         // Блокируем кнопку
         openBtn.disabled = true;
-        openBtn.style.opacity = '0.5';
         
-        // Скрываем информацию о кейсе и выбор количества (проверяем существование элементов)
-        const casePreview = document.getElementById('case-preview');
-        const openOptions = document.querySelector('.open-options'); // Изменили с id на класс
-        const processingStatus = document.getElementById('processing-status');
+        // Добавляем класс открытия для анимации
+        document.querySelector('.case-main').classList.add('case-opening');
         
-        if (casePreview) casePreview.classList.add('hidden');
-        if (openOptions) openOptions.classList.add('hidden');
-        if (processingStatus) processingStatus.classList.add('visible');
+        // Скрываем элементы
+        document.getElementById('case-preview').classList.add('hidden');
+        document.getElementById('open-options').classList.add('hidden');
         
-        // Показываем рулетку
-        const rouletteContainer = document.getElementById('roulette-container');
-        if (rouletteContainer) {
+        // Показываем статус обработки
+        document.getElementById('processing-status').classList.add('visible');
+        
+        // Через 1 секунду показываем рулетку
+        setTimeout(() => {
+            document.querySelector('.case-main').classList.remove('case-opening');
+            document.getElementById('processing-status').classList.remove('visible');
+            
+            const rouletteContainer = document.getElementById('roulette-container');
             rouletteContainer.style.display = 'block';
             setTimeout(() => {
                 rouletteContainer.classList.add('visible');
+                
+                // Если не демо-режим, списываем средства
+                if (!isDemo) {
+                    deductBalance(totalPrice);
+                }
+                
+                // Определяем выигранные предметы
+                wonItems = [];
+                for (let i = 0; i < selectedCount; i++) {
+                    wonItems.push(getRandomItem());
+                }
+                
+                // Запускаем анимацию рулетки
+                startRouletteAnimation();
             }, 10);
-        }
+        }, 1000);
         
-        // Снимаем деньги с баланса
+    } catch (error) {
+        console.error('Error opening case:', error);
+        showNotification('Ошибка при открытии кейса');
+        resetUI();
+    }
+}
+
+// Добавьте новую функцию для списания баланса
+async function deductBalance(amount) {
+    try {
         const { error: balanceError } = await supabase
             .from('users')
-            .update({ balance: userBalance - totalPrice })
+            .update({ balance: userBalance - amount })
             .eq('id', currentUser.id);
         
         if (balanceError) throw balanceError;
         
         // Обновляем баланс в UI
-        userBalance -= totalPrice;
+        userBalance -= amount;
         document.getElementById('user-balance').textContent = userBalance;
         
         // Добавляем запись в историю операций
@@ -402,24 +440,13 @@ async function openCase() {
             .insert([{
                 user_id: currentUser.id,
                 type: 'case',
-                amount: -totalPrice,
+                amount: -amount,
                 description: `Открытие кейса: ${caseData.name} (${selectedCount}x)`,
                 created_at: new Date().toISOString()
             }]);
-        
-        // Определяем выигранные предметы
-        wonItems = [];
-        for (let i = 0; i < selectedCount; i++) {
-            wonItems.push(getRandomItem());
-        }
-        
-        // Запускаем анимацию рулетки
-        startRouletteAnimation();
-        
     } catch (error) {
-        console.error('Error opening case:', error);
-        showNotification('Ошибка при открытии кейса');
-        resetUI();
+        console.error('Error deducting balance:', error);
+        throw error;
     }
 }
 

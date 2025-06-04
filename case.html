@@ -24,53 +24,56 @@
             </div>
         </header>
 
-        <!-- Основное содержимое -->
-        <!-- case.html - изменения в основном контейнере -->
         <main class="case-main">
-            <!-- Информация о кейсе (показывается по умолчанию) -->
+            <!-- Информация о кейсе -->
             <div class="case-preview" id="case-preview">
                 <img src="" alt="Кейс" id="case-image">
-                <h2 id="case-name">Название кейса</h2>
-                <p id="case-description">Описание кейса</p>
-                <div class="case-price">
-                    <span id="case-price-value">100</span> <i class="fas fa-coins"></i>
+                <h2 id="case-name">Кейс с магическими предметами</h2>
+                <p id="case-description">Откройте этот кейс и получите уникальные магические предметы</p>
+                <div class="case-price-container">
+                    <div class="case-price">
+                        <span id="case-price-value">750</span>
+                        <i class="fas fa-coins"></i>
+                    </div>
                 </div>
             </div>
 
-            <!-- Кнопки выбора количества (современный стиль) -->
-            <div class="open-options" id="open-options"> <!-- Добавили id -->
+            <!-- Демо-режим -->
+            <div class="demo-mode">
+                <span>Демо-режим</span>
+                <div class="demo-toggle" id="demo-toggle"></div>
+            </div>
+
+            <!-- Кнопки выбора количества -->
+            <div class="open-options" id="open-options">
                 <div class="option-selector">
+                    <div class="selector-highlight"></div>
                     <button class="open-option active" data-count="1">1x</button>
                     <button class="open-option" data-count="3">3x</button>
                     <button class="open-option" data-count="5">5x</button>
-                    <div class="selector-highlight"></div>
                 </div>
             </div>
 
-            <!-- Контейнер рулетки (изначально скрыт) -->
-            <div class="roulette-container" id="roulette-container" style="display: none;">
-                <div class="roulette-wheel" id="roulette-wheel">
-                    <!-- Предметы будут добавлены через JS -->
-                </div>
+            <button class="open-case-btn" id="open-case-btn">
+                <i class="fas fa-gift"></i> 
+                <span>Открыть</span>
+            </button>
+
+            <!-- Контейнер рулетки -->
+            <div class="roulette-container" id="roulette-container">
+                <div class="roulette-wheel" id="roulette-wheel"></div>
                 <div class="roulette-pointer"></div>
             </div>
 
-            <!-- case.html - добавьте этот блок после roulette-container -->
+            <!-- Статус обработки -->
             <div class="processing-status" id="processing-status">
-                <i class="fas fa-spinner fa-spin"></i> ОТКРЫТИЕ...
+                <i class="fas fa-spinner fa-spin"></i> Открываем кейс...
             </div>
-
-            <!-- Кнопка открытия -->
-            <button class="open-case-btn" id="open-case-btn">
-                <i class="fas fa-gift"></i> Открыть кейс
-            </button>
 
             <!-- Возможные призы -->
             <div class="possible-prizes">
                 <h3>Возможные призы <i class="fas fa-info-circle" id="chance-info-btn"></i></h3>
-                <div class="prizes-grid" id="prizes-grid">
-                    <!-- Предметы будут добавлены через JS -->
-                </div>
+                <div class="prizes-grid" id="prizes-grid"></div>
             </div>
         </main>
     </div>

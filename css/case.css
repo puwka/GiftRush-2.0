@@ -53,72 +53,205 @@
     overflow-y: auto;
 }
 
+/* Обновленные стили для превью кейса */
 .case-preview {
     text-align: center;
-    margin-bottom: 20px;
+    margin: 20px 0 30px;
+    padding: 25px;
+    background: rgba(30, 35, 40, 0.6);
+    border-radius: 20px;
+    border: 1px solid rgba(108, 92, 231, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transition: all 0.4s ease;
+    position: relative;
+}
+
+.case-preview::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        to bottom right,
+        rgba(108, 92, 231, 0) 0%,
+        rgba(108, 92, 231, 0) 45%,
+        rgba(108, 92, 231, 0.05) 50%,
+        rgba(108, 92, 231, 0) 55%,
+        rgba(108, 92, 231, 0) 100%
+    );
+    transform: rotate(30deg);
+    animation: shine 6s infinite;
+    opacity: 0.5;
 }
 
 .case-preview img {
-    width: 150px;
-    height: 150px;
+    width: 200px;
+    height: 200px;
     object-fit: contain;
-    margin-bottom: 15px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    margin: 0 auto 20px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    box-shadow: 
+        0 5px 15px rgba(0, 0, 0, 0.3),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    display: block;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 5px 10px rgba(108, 92, 231, 0.3));
+}
+
+.case-preview:hover img {
+    transform: scale(1.05) rotate(2deg);
 }
 
 .case-preview h2 {
-    font-size: 1.3rem;
-    margin-bottom: 5px;
-    color: var(--light-color);
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+    color: white;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .case-preview p {
     opacity: 0.8;
-    margin-bottom: 10px;
-    font-size: 0.9rem;
+    margin-bottom: 15px;
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.case-price-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 15px;
 }
 
 .case-price {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--warning-color);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #FFD700;
     display: inline-flex;
     align-items: center;
     background: rgba(0, 0, 0, 0.3);
-    padding: 8px 15px;
-    border-radius: 20px;
+    padding: 10px 20px;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
 }
 
 .case-price i {
+    margin-left: 8px;
+    color: #FFD700;
+}
+
+.open-case-btn {
+    width: 90%;
+    max-width: 300px;
+    min-height: 40px;
+    margin: 20px auto;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    border: none;
+    color: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 
+        0 4px 15px rgba(108, 92, 231, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+    position: relative;
+    overflow: hidden;
+}
+
+.open-case-btn .price-badge {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-left: 8px;
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+}
+
+.open-case-btn .price-badge i {
     margin-left: 5px;
 }
 
-.open-options {
+.open-case-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 
+        0 8px 25px rgba(108, 92, 231, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+
+.open-case-btn:active {
+    transform: translateY(1px);
+}
+
+/* Стили для демо-режима */
+.demo-mode {
     display: flex;
+    align-items: center;
     justify-content: center;
     gap: 10px;
     margin: 15px 0;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
 }
 
-.open-option {
-    background: rgba(108, 92, 231, 0.1);
-    border: 1px solid var(--primary-color);
-    color: var(--primary-color);
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-weight: 600;
+.demo-toggle {
+    position: relative;
+    width: 50px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s;
 }
 
-.open-option.active {
+.demo-toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    transition: all 0.3s;
+}
+
+.demo-toggle.active {
+    background: rgba(108, 92, 231, 0.5);
+}
+
+.demo-toggle.active::after {
+    left: calc(100% - 22px);
     background: var(--primary-color);
-    color: white;
 }
 
-.open-option:hover:not(.active) {
-    background: rgba(108, 92, 231, 0.2);
+/* Анимация при открытии кейса */
+@keyframes caseOpen {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(0.9); opacity: 0.8; }
+    100% { transform: scale(1.2); opacity: 0; }
+}
+
+.case-opening .case-preview {
+    animation: caseOpen 1s forwards;
 }
 
 .roulette-container {
