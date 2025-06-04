@@ -185,44 +185,79 @@ function fillRoulette() {
 }
 
 // Функция для заполнения возможных призов
-function fillPossiblePrizes() {
+async function fillPossiblePrizes() {
     const prizesGrid = document.getElementById('prizes-grid');
-    prizesGrid.innerHTML = '';
-    
-    // Отображаем топ-6 предметов по редкости
-    const topItems = [...caseItems]
-        .sort((a, b) => b.price - a.price)
-        .slice(0, 6);
-    
-    topItems.forEach(item => {
-        const prizeElement = document.createElement('div');
-        prizeElement.className = 'prize-item';
-        prizeElement.innerHTML = `
-            <div class="prize-icon-container">
-                <div class="prize-icon">
-                    <img src="${item.image_url}" alt="${item.name}">
-                </div>
-                <div class="prize-name">${item.name}</div>
-            </div>
-            <div class="prize-info">
-                <span class="prize-rarity ${item.rarity}">${getRarityName(item.rarity)}</span>
-                <i class="fas fa-info-circle info-icon" data-item-id="${item.id}"></i>
-            </div>
-            <div class="prize-chance">${item.chance}</div>
-        `;
+    prizesGrid.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Загрузка призов...</div>';
+
+    try {
+        // 1. Получаем ID выбранного кейса
+        const caseId = localStorage.getItem('selectedCaseId');
+        if (!caseId) {
+            throw new Error('Кейс не выбран');
+        }
+
+        // 2. Загружаем предметы кейса
+        const { data: caseItems, error } = await supabase
+            .from('case_items')
+            .select(`
+                id,
+                items!inner(
+                    id,
+                    name,
+                    price,
+                    image_url,
+                    rarity
+                )
+            `)
+            .eq('case_id', caseId);
+
+        if (error) throw error;
+
+        if (!caseItems || caseItems.length === 0) {
+            prizesGrid.innerHTML = '<p class="no-prizes">В этом кейсе пока нет призов</p>';
+            return;
+        }
+
+        // 3. Сортируем по возрастанию цены
+        const sortedItems = [...caseItems].sort((a, b) => a.items.price - b.items.price);
+
+        // 4. Очищаем контейнер и заполняем карточками
+        prizesGrid.innerHTML = '';
         
-        prizesGrid.appendChild(prizeElement);
-    });
-    
-    // Инициализация кнопок информации о предметах
-    document.querySelectorAll('.info-icon').forEach(icon => {
-        icon.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const itemId = icon.getAttribute('data-item-id');
-            const item = caseItems.find(i => i.id == itemId);
-            showItemInfo(item);
+        sortedItems.forEach(caseItem => {
+            const item = caseItem.items;
+            
+            const prizeElement = document.createElement('div');
+            prizeElement.className = `prize-item ${item.rarity || 'common'}`;
+            
+            prizeElement.innerHTML = `
+                <div class="prize-icon-container">
+                    <div class="prize-icon">
+                        <img src="${item.image_url || 'https://via.placeholder.com/80'}" 
+                             alt="${item.name}"
+                             onerror="this.src='https://via.placeholder.com/80'">
+                    </div>
+                    <div class="prize-name">${item.name}</div>
+                    <div class="prize-price-container">
+                        <span class="prize-price">${item.price || '0'}</span>
+                        <i class="fas fa-coins"></i>
+                    </div>
+                </div>
+            `;
+
+            prizesGrid.appendChild(prizeElement);
         });
-    });
+
+    } catch (error) {
+        console.error('Ошибка загрузки призов:', error);
+        prizesGrid.innerHTML = `
+            <div class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>${error.message || 'Не удалось загрузить список призов'}</p>
+                <button class="retry-btn" onclick="fillPossiblePrizes()">Повторить</button>
+            </div>
+        `;
+    }
 }
 
 // Функция для получения случайного предмета с учетом шансов
