@@ -5,7 +5,9 @@
     height: 100vh;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow-x: hidden; /* Добавлено */
+    width: 100%;
+    max-width: 100%;
 }
 
 .case-header {
@@ -51,8 +53,10 @@
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    overflow-x: hidden; /* Добавлено */
+    box-sizing: border-box;
+    width: 100%; /* Добавлено */
 }
-
 /* Обновленные стили для превью кейса */
 .case-preview {
     text-align: center;
@@ -87,8 +91,8 @@
 }
 
 .case-preview img {
-    width: 100px;
-    height: 100px;
+    width: 150px;
+    height: 150px;
     object-fit: contain;
     margin: 0 auto 20px;
     border-radius: 16px;
@@ -265,6 +269,7 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(5px);
     padding: 10px 0;
+    width: calc(100% - 40px); /* Учитываем padding */
 }
 
 .roulette-wheel {
@@ -272,6 +277,8 @@
     height: 100%;
     transition: transform 6s cubic-bezier(0.17, 0.67, 0.12, 0.99);
     will-change: transform;
+    width: auto;
+    overflow: hidden;
 }
 
 .roulette-item {
