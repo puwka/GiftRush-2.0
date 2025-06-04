@@ -91,8 +91,8 @@
 }
 
 .case-preview img {
-    width: 150px;
-    height: 150px;
+    width: 200px;
+    height: 200px;
     object-fit: contain;
     margin: 0 auto 20px;
     border-radius: 16px;
@@ -211,7 +211,9 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
-    margin: 15px 0;
+    margin: 15px auto;
+    width: calc(100% - 40px);
+    max-width: 400px;
     color: rgba(255, 255, 255, 0.7);
     font-size: 0.9rem;
 }
@@ -695,20 +697,20 @@
     }
 }
 
-/* case.css - добавьте эти стили */
-/* Стили для выбора количества кейсов */
 .open-options {
-    margin: 20px 0;
-    width: 100%;
+    margin: 20px auto;
+    width: calc(100% - 40px);
+    max-width: 400px; /* Ограничиваем максимальную ширину */
 }
 
 .option-selector {
     position: relative;
     display: flex;
-    background: rgba(45, 52, 54, 0.6);
+    background: rgba(45, 52, 54, 0.8);
     border-radius: 12px;
-    padding: 5px;
+    padding: 0; /* Убираем внутренние отступы */
     border: 1px solid rgba(108, 92, 231, 0.3);
+    overflow: hidden; /* Скрываем выходящие за границы элементы */
 }
 
 .selector-highlight {
@@ -722,6 +724,7 @@
     z-index: 1;
 }
 
+/* Стили для разделительных полосок */
 .open-option {
     flex: 1;
     position: relative;
@@ -730,11 +733,27 @@
     border: none;
     color: rgba(255, 255, 255, 0.7);
     padding: 10px;
-    border-radius: 8px;
+    border-radius: 0; /* Убираем скругления для кнопок */
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
-    transition: all 0.3s ease;
+}
+
+/* Добавляем разделители между кнопками */
+.open-option:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 60%;
+    background: linear-gradient(
+        to bottom,
+        transparent,
+        rgba(255, 255, 255, 0.15),
+        transparent
+    );
 }
 
 .open-options.hidden {
@@ -746,6 +765,11 @@
 
 .open-option.active {
     color: white;
+}
+
+/* Анимация при наведении */
+.open-option:hover {
+    background: rgba(255, 255, 255, 0.05);
 }
 
 /* Анимация для открытия кейса */
