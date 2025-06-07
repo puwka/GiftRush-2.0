@@ -43,6 +43,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     initEventListeners();
 });
 
+
+
 // Функция для получения пользователя
 async function getUser(tgUser) {
     try {
