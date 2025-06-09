@@ -385,35 +385,32 @@ async function openCase() {
         // Скрываем элементы
         document.getElementById('case-preview').classList.add('hidden');
         document.getElementById('open-options').classList.add('hidden');
+        openBtn.classList.add('hidden');
         
         // Показываем статус обработки
         document.getElementById('processing-status').classList.add('visible');
         
-        // Через 1 секунду показываем рулетку
+        // Через 0.5 секунды показываем рулетку
         setTimeout(() => {
-            document.querySelector('.case-main').classList.remove('case-opening');
             document.getElementById('processing-status').classList.remove('visible');
             
             const rouletteContainer = document.getElementById('roulette-container');
-            rouletteContainer.style.display = 'block';
-            setTimeout(() => {
-                rouletteContainer.classList.add('visible');
-                
-                // Если не демо-режим, списываем средства
-                if (!isDemo) {
-                    deductBalance(totalPrice);
-                }
-                
-                // Определяем выигранные предметы
-                wonItems = [];
-                for (let i = 0; i < selectedCount; i++) {
-                    wonItems.push(getRandomItem());
-                }
-                
-                // Запускаем анимацию рулетки
-                startRouletteAnimation();
-            }, 10);
-        }, 1000);
+            rouletteContainer.classList.add('visible');
+            
+            // Если не демо-режим, списываем средства
+            if (!isDemo) {
+                deductBalance(totalPrice);
+            }
+            
+            // Определяем выигранные предметы
+            wonItems = [];
+            for (let i = 0; i < selectedCount; i++) {
+                wonItems.push(getRandomItem());
+            }
+            
+            // Запускаем анимацию рулетки
+            startRouletteAnimation();
+        }, 500);
         
     } catch (error) {
         console.error('Error opening case:', error);
@@ -514,23 +511,21 @@ function resetUI() {
     const rouletteContainer = document.getElementById('roulette-container');
     const openBtn = document.getElementById('open-case-btn');
     
-    if (casePreview) casePreview.classList.remove('hidden');
+    if (casePreview) {
+        casePreview.classList.remove('hidden');
+        casePreview.style.height = '';
+        casePreview.style.margin = '';
+    }
     if (openOptions) openOptions.classList.remove('hidden');
     if (processingStatus) processingStatus.classList.remove('visible');
+    if (openBtn) {
+        openBtn.classList.remove('hidden');
+        openBtn.disabled = false;
+    }
     
     // Скрываем рулетку
     if (rouletteContainer) {
         rouletteContainer.classList.remove('visible');
-        setTimeout(() => {
-            rouletteContainer.style.display = 'none';
-        }, 300);
-    }
-    
-    // Разблокируем кнопку открытия
-    if (openBtn) {
-        openBtn.disabled = false;
-        openBtn.style.opacity = '1';
-        openBtn.innerHTML = '<i class="fas fa-gift"></i> Открыть кейс';
     }
 }
 
