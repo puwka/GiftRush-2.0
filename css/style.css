@@ -3365,3 +3365,198 @@ body {
         opacity: 1;
     }
 }
+
+/* --- Современный баннер главной страницы --- */
+.main-banner {
+    position: relative;
+    background: linear-gradient(120deg, var(--primary-color) 60%, var(--accent-color) 100%);
+    border-radius: 28px;
+    overflow: hidden;
+    margin: 0 0 32px 0;
+    box-shadow: 0 8px 32px rgba(108,92,231,0.18);
+    min-height: 220px;
+    display: flex;
+    align-items: stretch;
+    z-index: 2;
+}
+.main-banner-bg {
+    position: absolute;
+    inset: 0;
+    background: url('../assets/case4.png') right bottom/auto 80% no-repeat, linear-gradient(120deg, var(--primary-color) 60%, var(--accent-color) 100%);
+    opacity: 0.13;
+    z-index: 1;
+}
+.main-banner-content {
+    position: relative;
+    display: flex;
+    width: 100%;
+    z-index: 2;
+    padding: 32px 40px 32px 32px;
+    justify-content: space-between;
+    align-items: center;
+}
+.main-banner-left {
+    flex: 1 1 60%;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+.main-banner-badge {
+    display: inline-block;
+    background: linear-gradient(90deg, var(--warning-color), var(--accent-color));
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    border-radius: 18px;
+    padding: 6px 18px;
+    box-shadow: 0 2px 12px rgba(253,121,168,0.18);
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    animation: pulse 2s infinite;
+}
+.main-banner-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.13);
+    margin-bottom: 0;
+}
+.main-banner-desc {
+    color: var(--light-color);
+    font-size: 1.1rem;
+    opacity: 0.92;
+    margin-bottom: 0;
+}
+.main-banner-timer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0,0,0,0.18);
+    border-radius: 12px;
+    padding: 7px 16px;
+    color: #fff;
+    font-size: 1rem;
+    width: fit-content;
+    margin-bottom: 0;
+}
+.main-banner-timer i {
+    color: var(--warning-color);
+}
+.main-banner-btn {
+    margin-top: 10px;
+    background: linear-gradient(90deg, var(--accent-color), var(--primary-color));
+    color: #fff;
+    font-weight: 700;
+    border: none;
+    border-radius: 18px;
+    padding: 12px 28px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 2px 12px rgba(253,121,168,0.13);
+    transition: background 0.2s, transform 0.2s;
+}
+.main-banner-btn:hover {
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    transform: translateY(-2px) scale(1.04);
+}
+.main-banner-right {
+    flex: 1 1 40%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+.main-banner-img {
+    max-width: 180px;
+    filter: drop-shadow(0 8px 32px var(--primary-color));
+    border-radius: 18px;
+    background: rgba(255,255,255,0.04);
+}
+@media (max-width: 900px) {
+    .main-banner-content { flex-direction: column; align-items: flex-start; padding: 24px; }
+    .main-banner-right { justify-content: flex-start; margin-top: 18px; }
+}
+@media (max-width: 600px) {
+    .main-banner { min-height: 160px; }
+    .main-banner-content { padding: 16px; }
+    .main-banner-title { font-size: 1.3rem; }
+    .main-banner-img { max-width: 110px; }
+}
+
+/* --- Новая сетка кейсов --- */
+.cases-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 28px;
+    margin: 32px 0 0 0;
+    width: 100%;
+    z-index: 2;
+}
+.cases-container-wrapper.modern {
+    background: rgba(44, 62, 80, 0.18);
+    border-radius: 18px;
+    padding: 18px 12px 24px 12px;
+    margin-bottom: 32px;
+    box-shadow: 0 2px 12px rgba(108,92,231,0.08);
+}
+
+/* --- Визуальная статистика --- */
+.case-stats-modern {
+    display: flex;
+    gap: 24px;
+    margin: 0 0 0 0;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+.case-stat-card {
+    background: linear-gradient(120deg, var(--darker-color) 80%, var(--primary-color) 100%);
+    border-radius: 18px;
+    box-shadow: 0 2px 12px rgba(108,92,231,0.10);
+    padding: 22px 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 220px;
+    flex: 1 1 0;
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+.case-stat-card:hover {
+    box-shadow: 0 6px 24px rgba(253,121,168,0.18);
+    transform: translateY(-2px) scale(1.03);
+}
+.case-stat-icon {
+    font-size: 2.1rem;
+    color: var(--accent-color);
+    margin-bottom: 10px;
+}
+.case-stat-label {
+    font-size: 1.05rem;
+    color: var(--secondary-color);
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+.case-stat-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 8px;
+}
+.case-stat-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: auto;
+}
+.case-stat-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-color), var(--primary-color));
+    border-radius: 8px;
+    transition: width 0.6s cubic-bezier(.4,0,.2,1);
+}
+@media (max-width: 900px) {
+    .case-stats-modern { flex-direction: column; gap: 18px; }
+    .case-stat-card { min-width: 0; width: 100%; }
+}
