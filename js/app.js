@@ -1,6 +1,3 @@
-import { TonConnect } from '@tonconnect/sdk';
-import { createClient } from '@supabase/supabase-js';
-
 // Инициализация Telegram WebApp
 const tg = window.Telegram?.WebApp || {
     initDataUnsafe: {},
@@ -15,10 +12,13 @@ let userBalance = 0;
 let inventoryItems = [];
 let casesData = [];
 
-// Инициализация Supabase
-const SUPABASE_URL = 'https://kggaengzxmautimlvcgh.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtnZ2Flbmd6eG1hdXRpbWx2Y2doIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc2NTgzOTEsImV4cCI6MjA2MzIzNDM5MX0.2NFe8_6OnvCjGVueJuVA1cO9zsjYTttID8UR90l9T9Q';
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+// Убедиться, что window.supabase — это клиент Supabase, а не undefined или объект из CDN
+if (!window.supabase || typeof window.supabase.from !== 'function') {
+    // Вставьте сюда ваш URL и ключ Supabase
+    const SUPABASE_URL = 'https://kggaengzxmautimlvcgh.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtnZ2Flbmd6eG1hdXRpbWx2Y2doIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc2NTgzOTEsImV4cCI6MjA2MzIzNDM5MX0.2NFe8_6OnvCjGVueJuVA1cO9zsjYTttID8UR90l9T9Q';
+    window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+}
 
 // Инициализация приложения
 // Обновите код в app.js (в начале функции DOMContentLoaded)
@@ -158,7 +158,7 @@ function initComingSoonScreen() {
 async function getUserOrCreate(tgUser) {
     try {
         // Проверяем, есть ли пользователь в БД
-        const { data: existingUser, error } = await supabase
+        const { data: existingUser, error } = await window.supabase
             .from('users')
             .select('*')
             .eq('telegram_id', tgUser.id)
@@ -169,7 +169,7 @@ async function getUserOrCreate(tgUser) {
         }
         
         // Создаем нового пользователя
-        const { data: newUser, error: createError } = await supabase
+        const { data: newUser, error: createError } = await window.supabase
             .from('users')
             .insert([{
                 telegram_id: tgUser.id,
@@ -193,7 +193,7 @@ async function getUserOrCreate(tgUser) {
         if (createError) throw createError;
         
         // Создаем первую запись в истории операций
-        await supabase
+        await window.supabase
             .from('transactions')
             .insert([{
                 user_id: newUser.id,
@@ -283,7 +283,7 @@ async function loadUserBalance() {
     if (!currentUser) return;
     
     try {
-        const { data, error } = await supabase
+        const { data, error } = await window.supabase
             .from('users')
             .select('balance')
             .eq('id', currentUser.id)
@@ -306,7 +306,7 @@ async function loadInventory() {
     if (!currentUser) return;
     
     try {
-        const { data, error } = await supabase
+        const { data, error } = await window.supabase
             .from('inventory')
             .select(`
                 id,
@@ -473,7 +473,7 @@ function openItemModal(item) {
 async function sellItem(item) {
     try {
         // Удаляем предмет из инвентаря
-        const { error: deleteError } = await supabase
+        const { error: deleteError } = await window.supabase
             .from('inventory')
             .delete()
             .eq('id', item.id);
@@ -481,7 +481,7 @@ async function sellItem(item) {
         if (deleteError) throw deleteError;
         
         // Добавляем деньги на баланс
-        const { error: updateError } = await supabase
+        const { error: updateError } = await window.supabase
             .from('users')
             .update({ balance: userBalance + item.items.price })
             .eq('id', currentUser.id);
@@ -489,7 +489,7 @@ async function sellItem(item) {
         if (updateError) throw updateError;
         
         // Добавляем запись в историю операций
-        await supabase
+        await window.supabase
             .from('transactions')
             .insert([{
                 user_id: currentUser.id,
@@ -528,7 +528,7 @@ async function withdrawItem(item) {
         }
         
         // Создаем запрос на вывод
-        const { error } = await supabase
+        const { error } = await window.supabase
             .from('withdrawals')
             .insert([{
                 user_id: currentUser.id,
@@ -540,13 +540,13 @@ async function withdrawItem(item) {
         if (error) throw error;
         
         // Удаляем предмет из инвентаря
-        await supabase
+        await window.supabase
             .from('inventory')
             .delete()
             .eq('id', item.id);
         
         // Добавляем запись в историю операций
-        await supabase
+        await window.supabase
             .from('transactions')
             .insert([{
                 user_id: currentUser.id,
@@ -575,7 +575,7 @@ async function loadTransactions() {
     if (!currentUser) return;
     
     try {
-        const { data, error } = await supabase
+        const { data, error } = await window.supabase
             .from('transactions')
             .select('*')
             .eq('user_id', currentUser.id)
@@ -970,7 +970,7 @@ async function loadMoreTransactions() {
     try {
         const currentCount = document.querySelectorAll('.operation-item').length;
         
-        const { data, error } = await supabase
+        const { data, error } = await window.supabase
             .from('transactions')
             .select('*')
             .eq('user_id', currentUser.id)
@@ -1083,7 +1083,7 @@ async function spinBonusRoulette() {
         // Проверяем, получал ли пользователь уже бонус сегодня
         const today = new Date().toISOString().split('T')[0];
         
-        const { data: todayBonus, error: bonusError } = await supabase
+        const { data: todayBonus, error: bonusError } = await window.supabase
             .from('daily_bonuses')
             .select('*')
             .eq('user_id', currentUser.id)
@@ -1144,7 +1144,7 @@ async function spinBonusRoulette() {
                         
                     case 'item':
                         // Получаем случайный предмет указанной редкости
-                        const { data: randomItem, error: itemError } = await supabase
+                        const { data: randomItem, error: itemError } = await window.supabase
                             .from('items')
                             .select('*')
                             .eq('rarity', prizeValue)
@@ -1154,7 +1154,7 @@ async function spinBonusRoulette() {
                         
                         if (randomItem && randomItem.length > 0) {
                             const item = randomItem[0];
-                            await supabase.from('inventory').insert([{
+                            await window.supabase.from('inventory').insert([{
                                 user_id: currentUser.id,
                                 item_id: item.id,
                                 obtained_at: new Date().toISOString()
@@ -1168,7 +1168,7 @@ async function spinBonusRoulette() {
                 
                 // Обновляем баланс пользователя
                 if (rewardAmount > 0) {
-                    await supabase
+                    await window.supabase
                         .from('users')
                         .update({ balance: userBalance })
                         .eq('id', currentUser.id);
@@ -1178,7 +1178,7 @@ async function spinBonusRoulette() {
                 }
                 
                 // Записываем получение бонуса
-                await supabase.from('daily_bonuses').insert([{
+                await window.supabase.from('daily_bonuses').insert([{
                     user_id: currentUser.id,
                     type: prizeType,
                     value: prizeValue,
@@ -1187,7 +1187,7 @@ async function spinBonusRoulette() {
                 
                 // Добавляем запись в историю операций
                 if (rewardAmount > 0) {
-                    await supabase
+                    await window.supabase
                         .from('transactions')
                         .insert([{
                             user_id: currentUser.id,
@@ -1244,7 +1244,7 @@ async function processDeposit() {
     
     // Здесь должна быть логика обработки платежа
     // Для демонстрации просто добавляем сумму на баланс
-    const { error } = await supabase
+    const { error } = await window.supabase
         .from('users')
         .update({ balance: userBalance + totalAmount })
         .eq('id', currentUser.id);
@@ -1271,7 +1271,7 @@ async function applyPromoCode(code) {
     
     try {
         // Проверяем промокод в БД
-        const { data: promo, error } = await supabase
+        const { data: promo, error } = await window.supabase
             .from('promo_codes')
             .select('*')
             .eq('code', code.toUpperCase())
@@ -1284,7 +1284,7 @@ async function applyPromoCode(code) {
         }
         
         // Проверяем, не использовал ли пользователь уже этот промокод
-        const { data: usage, error: usageError } = await supabase
+        const { data: usage, error: usageError } = await window.supabase
             .from('promo_code_usage')
             .select('*')
             .eq('user_id', currentUser.id)
@@ -1298,7 +1298,7 @@ async function applyPromoCode(code) {
         }
         
         // Добавляем бонус на баланс
-        const { error: updateError } = await supabase
+        const { error: updateError } = await window.supabase
             .from('users')
             .update({ balance: userBalance + promo.reward_amount })
             .eq('id', currentUser.id);
@@ -1306,7 +1306,7 @@ async function applyPromoCode(code) {
         if (updateError) throw updateError;
         
         // Записываем использование промокода
-        await supabase
+        await window.supabase
             .from('promo_code_usage')
             .insert([{
                 user_id: currentUser.id,
@@ -1315,7 +1315,7 @@ async function applyPromoCode(code) {
             }]);
         
         // Добавляем запись в историю операций
-        await supabase
+        await window.supabase
             .from('transactions')
             .insert([{
                 user_id: currentUser.id,
@@ -1353,7 +1353,7 @@ async function createPromoCode() {
         const weekAgo = new Date();
         weekAgo.setDate(weekAgo.getDate() - 7);
         
-        const { data: recentPromos, error: promosError } = await supabase
+        const { data: recentPromos, error: promosError } = await window.supabase
             .from('promo_codes')
             .select('*')
             .eq('creator_id', currentUser.id)
@@ -1371,7 +1371,7 @@ async function createPromoCode() {
         const rewardAmount = 50; // Стандартная награда
         
         // Создаем промокод в БД
-        const { data, error } = await supabase
+        const { data, error } = await window.supabase
             .from('promo_codes')
             .insert([{
                 code: promoCode,
@@ -1429,7 +1429,7 @@ async function initCases() {
         `;
 
         // 1. Сначала загружаем кейсы
-        const { data: cases, error: casesError } = await supabase
+        const { data: cases, error: casesError } = await window.supabase
             .from('cases')
             .select(`
                 id,
@@ -1459,7 +1459,7 @@ async function initCases() {
 
         // 2. Затем для каждого кейса загружаем количество предметов
         const casesWithItems = await Promise.all(cases.map(async (caseItem) => {
-            const { count: itemsCount, error: countError } = await supabase
+            const { count: itemsCount, error: countError } = await window.supabase
                 .from('case_items')
                 .select('*', { count: 'exact', head: true })
                 .eq('case_id', caseItem.id);
