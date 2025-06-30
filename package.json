@@ -1,7 +1,28 @@
 {
   "dependencies": {
+    "@supabase/supabase-js": "^2.50.2",
     "@tonconnect/sdk": "^3.2.0",
     "supabase": "^2.22.12",
-    "vercel": "^41.7.8"
-  }
+    "vercel": "^41.7.8",
+    "vite": "^7.0.0"
+  },
+  "name": "giftrush-2.0",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/puwka/GiftRush-2.0.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/puwka/GiftRush-2.0/issues"
+  },
+  "homepage": "https://github.com/puwka/GiftRush-2.0#readme",
+  "description": ""
 }
