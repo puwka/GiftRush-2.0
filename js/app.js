@@ -17,7 +17,7 @@ if (!window.supabase || typeof window.supabase.from !== 'function') {
     // Вставьте сюда ваш URL и ключ Supabase
     const SUPABASE_URL = 'https://kggaengzxmautimlvcgh.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtnZ2Flbmd6eG1hdXRpbWx2Y2doIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc2NTgzOTEsImV4cCI6MjA2MzIzNDM5MX0.2NFe8_6OnvCjGVueJuVA1cO9zsjYTttID8UR90l9T9Q';
-    window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    window.supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 }
 
 // Инициализация приложения
