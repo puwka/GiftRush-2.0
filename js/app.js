@@ -869,6 +869,10 @@ function initButtons() {
     const tonConnectBtn = document.getElementById('tonconnect-btn');
     if (tonConnectBtn) {
         tonConnectBtn.addEventListener('click', async () => {
+            if (!window.TonConnectSDK || !window.TonConnectSDK.TonConnect) {
+                showNotification('TonConnect SDK не загружен. Попробуйте обновить страницу.');
+                return;
+            }
             const tonAmount = parseFloat(document.getElementById('ton-amount').value);
             if (!tonAmount || tonAmount <= 0) {
                 showNotification('Введите сумму в TON');
