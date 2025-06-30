@@ -574,23 +574,19 @@ function resetUI() {
     const processingStatus = document.getElementById('processing-status');
     const rouletteContainer = document.getElementById('roulette-container');
     const openBtn = document.getElementById('open-case-btn');
-    
+
+    // Принудительно убираем hidden у всех, кто может его получить
+    [casePreview, openOptions, openBtn].forEach(el => {
+        if (el) el.classList.remove('hidden');
+    });
+
     if (casePreview) {
-        casePreview.classList.remove('hidden');
         casePreview.style.height = '';
         casePreview.style.margin = '';
     }
-    if (openOptions) openOptions.classList.remove('hidden');
     if (processingStatus) processingStatus.classList.remove('visible');
-    if (openBtn) {
-        openBtn.classList.remove('hidden');
-        openBtn.disabled = false;
-    }
-    
-    // Скрываем рулетку
-    if (rouletteContainer) {
-        rouletteContainer.classList.remove('visible');
-    }
+    if (openBtn) openBtn.disabled = false;
+    if (rouletteContainer) rouletteContainer.classList.remove('visible');
 }
 
 // Функция для продажи выигранного предмета
