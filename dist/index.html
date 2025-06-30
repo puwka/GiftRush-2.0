@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GiftRush - Открывай кейсы и получай подарки</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script type="module" crossorigin src="/assets/index-Bvmnm0M6.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-D1D6oPkl.css">
+</head>
+<body>
+    <!-- Экран "В разработке" - показывается сразу -->
+    <div id="coming-soon-screen" class="coming-soon-container">
+        <div class="coming-soon-content">
+            <!-- Содержимое экрана "В разработке" -->
+        </div>
+    </div>
+
+    <!-- Добавьте этот код в index.html перед app-container -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <!-- Анимированный логотип -->
+            <div class="loading-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <div class="logo-text">GiftRush</div>
+            </div>
+            
+            <!-- Прогресс бар с анимацией -->
+            <div class="loading-progress">
+                <div class="progress-bar"></div>
+                <div class="progress-text">Загрузка...</div>
+            </div>
+            
+            <!-- Красивые анимированные элементы -->
+            <div class="loading-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Шапка -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1 class="app-title">GiftRush</h1>
+                <div class="balance-container">
+                    <span class="balance" id="user-balance">0</span>
+                    <i class="fas fa-coins balance-icon"></i>
+                    <button class="add-balance-btn" id="add-balance-btn">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Основное содержимое -->
+        <main class="app-main">
+            <!-- Вкладка Кейсы -->
+            <div class="tab-content active" id="cases-tab">
+                <!-- Обновленный баннер в index.html -->
+                <div class="case-banner premium">
+                    <div class="banner-content">
+                        <div class="banner-badge">
+                            <span>🔥 ЛИМИТИРОВАННОЕ ИЗДАНИЕ</span>
+                        </div>
+                        <h3>ОГНЕННЫЕ КЕЙСЫ</h3>
+                        <p>Эксклюзивные предметы с повышенным шансом выпадения</p>
+                        <div class="banner-timer">
+                            <div class="timer-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="timer-text">
+                                <span>До конца акции:</span>
+                                <div class="timer-value">12:34:56</div>
+                            </div>
+                        </div>
+                        <button class="banner-button">
+                            Открыть сейчас
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div class="banner-image"></div>
+                    <div class="banner-overlay"></div>
+                    <div class="banner-particles">
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                        <div class="particle"></div>
+                    </div>
+                    <div class="banner-glow"></div>
+                </div>
+                
+                <!-- Фильтры кейсов -->
+                <div class="case-filters-container">
+                    <div class="case-filters-scroll">
+                        <div class="case-filters">
+                            <button class="filter-btn active" data-filter="all">
+                                <i class="fas fa-layer-group"></i> Все
+                            </button>
+                            <button class="filter-btn" data-filter="common">
+                                <i class="fas fa-box"></i> Обычные
+                            </button>
+                            <button class="filter-btn" data-filter="uncommon">
+                                <i class="fas fa-leaf"></i> Необычные
+                            </button>
+                            <button class="filter-btn" data-filter="rare">
+                                <i class="fas fa-gem"></i> Редкие
+                            </button>
+                            <button class="filter-btn" data-filter="epic">
+                                <i class="fas fa-bolt"></i> Эпические
+                            </button>
+                            <button class="filter-btn" data-filter="legendary">
+                                <i class="fas fa-crown"></i> Легендарные
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Список кейсов -->
+                <div class="cases-container-wrapper">
+                    <div class="cases-container">
+                        <!-- Кейсы будут загружаться из БД через JS -->
+                        <div class="case-loading">
+                            <div class="loading-spinner"></div>
+                            <p>Загрузка кейсов...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Статистика кейсов -->
+                <div class="case-stats-container">
+                    <div class="case-stats-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Игроков онлайн</h3>
+                            <div class="stat-value-user" id="online-users">1,245</div>
+                            <div class="stat-label">+15 за час</div>
+                        </div>
+                    </div>
+                    
+                    <div class="case-stats-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Открыто кейсов</h3>
+                            <div class="stat-value-user" id="opened-cases">24,876</div>
+                            <div class="stat-label">+328 сегодня</div>
+                        </div>
+                    </div>
+                    
+                    <div class="case-stats-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-gem"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Редких предметов</h3>
+                            <div class="stat-value-user" id="rare-items">1,245</div>
+                            <div class="stat-label">Выпало сегодня</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Вкладка Бонусы -->
+            <div class="tab-content" id="bonuses-tab">
+                <div class="bonus-section">
+                    <h2><i class="fas fa-gift"></i> Ежедневная рулетка</h2>
+                    <div class="roulette-container">
+                        <div class="roulette-wheel" id="bonus-roulette">
+                            <div class="roulette-item" data-type="balance" data-value="50">
+                                <div class="roulette-icon"><i class="fas fa-coins"></i></div>
+                                <div class="roulette-value">50 монет</div>
+                            </div>
+                            <div class="roulette-item" data-type="discount" data-value="10">
+                                <div class="roulette-icon"><i class="fas fa-percent"></i></div>
+                                <div class="roulette-value">10% скидка</div>
+                            </div>
+                            <div class="roulette-item" data-type="item" data-value="common">
+                                <div class="roulette-icon"><i class="fas fa-box-open"></i></div>
+                                <div class="roulette-value">Обычный предмет</div>
+                            </div>
+                            <div class="roulette-item" data-type="balance" data-value="100">
+                                <div class="roulette-icon"><i class="fas fa-coins"></i></div>
+                                <div class="roulette-value">100 монет</div>
+                            </div>
+                            <div class="roulette-item" data-type="discount" data-value="20">
+                                <div class="roulette-icon"><i class="fas fa-percent"></i></div>
+                                <div class="roulette-value">20% скидка</div>
+                            </div>
+                            <div class="roulette-item" data-type="item" data-value="rare">
+                                <div class="roulette-icon"><i class="fas fa-gem"></i></div>
+                                <div class="roulette-value">Редкий предмет</div>
+                            </div>
+                        </div>
+                        <div class="roulette-pointer"></div>
+                    </div>
+
+                    <button class="spin-roulette-btn" id="spin-roulette-btn">
+                        <i class="fas fa-sync-alt"></i> Крутить рулетку
+                    </button>
+
+                    <p class="roulette-info">
+                        <i class="fas fa-info-circle"></i> Крутите рулетку каждый день!
+                    </p>
+
+                    <div class="possible-prizes">
+                        <h3>Возможные призы <i class="fas fa-info-circle"></i></h3>
+                        <div class="prizes-grid">
+                            <div class="prize-item" data-chance="20%">
+                                <div class="prize-icon"><i class="fas fa-coins"></i></div>
+                                <div class="prize-info">
+                                    <span>50 монет</span>
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                </div>
+                            </div>
+                            <div class="prize-item" data-chance="10%">
+                                <div class="prize-icon"><i class="fas fa-coins"></i></div>
+                                <div class="prize-info">
+                                    <span>100 монет</span>
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                </div>
+                            </div>
+                            <div class="prize-item" data-chance="15%">
+                                <div class="prize-icon"><i class="fas fa-percent"></i></div>
+                                <div class="prize-info">
+                                    <span>10% скидка</span>
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                </div>
+                            </div>
+                            <div class="prize-item" data-chance="15%">
+                                <div class="prize-icon"><i class="fas fa-percent"></i></div>
+                                <div class="prize-info">
+                                    <span>20% скидка</span>
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                </div>
+                            </div>
+                            <div class="prize-item" data-chance="25%">
+                                <div class="prize-icon"><i class="fas fa-box-open"></i></div>
+                                <div class="prize-info">
+                                    <span>Обычный предмет</span>
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                </div>
+                            </div>
+                            <div class="prize-item" data-chance="25%">
+                                <div class="prize-icon"><i class="fas fa-box-open"></i></div>
+                                <div class="prize-info">
+                                    <span>Редкий предмет</span>
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bonus-section">
+                    <h2><i class="fas fa-users"></i> Реферальная программа</h2>
+                    <div class="referral-container">
+                        <p>Приглашайте друзей и получайте бонусы!</p>
+                        <div class="referral-stats">
+                            <div class="stat-item">
+                                <div class="stat-value-bonus" id="ref-count">0</div>
+                                <div class="stat-label">Приглашено</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value-bonus" id="ref-earned">0</div>
+                                <div class="stat-label">Заработано</div>
+                            </div>
+                        </div>
+                        <div class="referral-info">
+                            <i class="fas fa-info-circle"></i>
+                            <p>Вы можете вывести от 50 USDT с каждого приглашенного друга после их первого пополнения</p>
+                        </div>
+                        <div class="referral-link-container">
+                            <input type="text" id="referral-link" readonly value="https://t.me/GiftDropDemoBot?start=ref123">
+                            <button class="copy-link-btn" id="copy-link-btn">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bonus-section">
+                    <h2><i class="fas fa-ticket-alt"></i> Промокоды</h2>
+                    <div class="promo-container">
+                        <input type="text" id="promo-input" placeholder="Введите промокод">
+                        <button class="apply-promo-btn" id="apply-promo-btn">Активировать</button>
+                    </div>
+                    <!-- Замените существующую кнопку на эту -->
+                    <button class="create-promo-btn" id="create-promo-btn">
+                        <i class="fas fa-plus-circle"></i> Создать промокод
+                    </button>
+                </div>
+            </div>
+
+            <!-- Вкладка Апгрейд -->
+            <div class="tab-content" id="upgrade-tab">
+                <div class="upgrade-container">
+                    <div class="upgrade-card">
+                        <div class="upgrade-icon"><i class="fas fa-medal"></i></div>
+                        <div class="upgrade-info">
+                            <h3>Уровень аккаунта</h3>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 30%;"></div>
+                            </div>
+                            <p>Текущий уровень: <span class="level-value">1</span></p>
+                            <button class="upgrade-btn">Улучшить</button>
+                        </div>
+                    </div>
+
+                    <div class="upgrade-card">
+                        <div class="upgrade-icon"><i class="fas fa-box-open"></i></div>
+                        <div class="upgrade-info">
+                            <h3>Улучшение кейсов</h3>
+                            <p>Увеличивает шанс на редкие предметы</p>
+                            <div class="upgrade-levels">
+                                <div class="level active">I</div>
+                                <div class="level">II</div>
+                                <div class="level">III</div>
+                                <div class="level">IV</div>
+                                <div class="level">V</div>
+                            </div>
+                            <button class="upgrade-btn">Улучшить (500 <i class="fas fa-coins"></i>)</button>
+                        </div>
+                    </div>
+
+                    <div class="upgrade-card">
+                        <div class="upgrade-icon"><i class="fas fa-coins"></i></div>
+                        <div class="upgrade-info">
+                            <h3>Бонус к балансу</h3>
+                            <p>+10% к пополнению баланса</p>
+                            <div class="upgrade-levels">
+                                <div class="level active">I</div>
+                                <div class="level">II</div>
+                                <div class="level">III</div>
+                            </div>
+                            <button class="upgrade-btn">Улучшить (300 <i class="fas fa-coins"></i>)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- В index.html (обновленная вкладка Профиль) -->
+            <div class="tab-content" id="profile-tab">
+                <!-- Шапка профиля -->
+                <div class="profile-section">
+                    <div class="profile-header">
+                        <div class="user-card">
+                            <div class="user-avatar glow" id="user-avatar">
+                                <img src="#" alt="Аватар" id="avatar-img">
+                                <div class="online-status"></div>
+                                <div class="user-level-badge">Ур. <span id="user-level-value">1</span></div>
+                            </div>
+                            <div class="user-info">
+                                <h2 id="user-name">Имя пользователя</h2>
+                                <div class="user-stats">
+                                    <div class="stat-item">
+                                        <i class="fas fa-coins"></i>
+                                        <span id="user-balance-stat">0</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <i class="fas fa-box-open"></i>
+                                        <span id="cases-opened-stat">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Статистика -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-medal"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Опыт</h3>
+                                <div class="progress-container">
+                                    <div class="progress-bar-profile" style="width: 30%;"></div>
+                                </div>
+                                <div class="stat-value">150/500 XP</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Рефералы</h3>
+                                <div class="stat-value" id="ref-count-stat">0</div>
+                                <div class="stat-label">Заработано: <span id="ref-earned-stat">0</span> USDT</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-gem"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Редкость</h3>
+                                <div class="rarity-badge epic">Эпический</div>
+                                <div class="stat-label">Топ 15% игроков</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Достижения</h3>
+                                <div class="stat-value">5/20</div>
+                                <div class="stat-label">Следующее: 100 XP</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Инвентарь -->
+                <div class="profile-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-box-open"></i> Инвентарь
+                    </h2>
+                    
+                    <div class="inventory-nav">
+                        <button class="inv-filter active" data-type="gifts">Подарки</button>
+                        <button class="inv-filter" data-type="bonuses">Бонусы</button>
+                        <button class="inv-filter" data-type="other">Другое</button>
+                    </div>
+                    
+                    <div class="inventory-container active" data-type="gifts">
+                        <div class="inventory-grid" id="gifts-items">
+                            <!-- Элементы будут добавлены через JS -->
+                            <div class="empty-inventory">
+                                <i class="fas fa-box-open"></i>
+                                <p>Ваш инвентарь пуст</p>
+                                <button class="btn-primary">Открыть кейс</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="inventory-container" data-type="bonuses">
+                        <div class="inventory-grid" id="bonus-items">
+                            <!-- Элементы будут добавлены через JS -->
+                            <div class="empty-inventory">
+                                <i class="fas fa-gift"></i>
+                                <p>Нет бонусных предметов</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="inventory-container" data-type="other">
+                        <div class="inventory-grid" id="other-items">
+                            <!-- Элементы будут добавлены через JS -->
+                            <div class="empty-inventory">
+                                <i class="fas fa-archive"></i>
+                                <p>Здесь пока ничего нет</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- История операций -->
+                <div class="profile-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-history"></i> История операций
+                    </h2>
+                    
+                    <div class="operations-list">
+                        <div class="operation-item">
+                            <div class="operation-icon deposit">
+                                <i class="fas fa-coins"></i>
+                            </div>
+                            <div class="operation-info">
+                                <h3>Пополнение баланса</h3>
+                                <p>Сегодня, 15:30</p>
+                            </div>
+                            <div class="operation-amount positive">
+                                +500 <i class="fas fa-coins"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="operation-item">
+                            <div class="operation-icon case">
+                                <i class="fas fa-box-open"></i>
+                            </div>
+                            <div class="operation-info">
+                                <h3>Открытие кейса</h3>
+                                <p>Сегодня, 15:15</p>
+                            </div>
+                            <div class="operation-amount negative">
+                                -100 <i class="fas fa-coins"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="operation-item">
+                            <div class="operation-icon bonus">
+                                <i class="fas fa-gift"></i>
+                            </div>
+                            <div class="operation-info">
+                                <h3>Ежедневный бонус</h3>
+                                <p>Сегодня, 12:00</p>
+                            </div>
+                            <div class="operation-amount positive">
+                                +50 <i class="fas fa-coins"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-secondary show-more-btn">
+                        Показать еще
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Нижнее меню -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active" data-tab="cases-tab">
+                <i class="fas fa-box-open"></i>
+                <span>Кейсы</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="bonuses-tab">
+                <i class="fas fa-gift"></i>
+                <span>Бонусы</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="upgrade-tab">
+                <i class="fas fa-level-up-alt"></i>
+                <span>Апгрейд</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="profile-tab">
+                <i class="fas fa-user"></i>
+                <span>Профиль</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Модальное окно пополнения баланса -->
+    <div class="modal" id="deposit-modal">
+        <div class="modal-content deposit-modal">
+            <div class="modal-header">
+                <h2>Пополнение баланса</h2>
+                <button class="close-modal" id="close-deposit-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Вкладки способов оплаты -->
+                <div class="deposit-tabs">
+                    <button class="deposit-tab active" data-tab="stars">
+                        <i class="fas fa-star"></i> Telegram Stars
+                    </button>
+                    <button class="deposit-tab" data-tab="ton">
+                        <i class="fab fa-telegram"></i> TON (+20%)
+                    </button>
+                </div>
+                
+                <!-- Контент вкладок -->
+                <div class="deposit-tab-content active" id="stars-tab">
+                    <div class="deposit-input-group">
+                        <label for="deposit-amount">Сумма пополнения</label>
+                        <div class="input-with-icon">
+                            <input type="number" id="deposit-amount" placeholder="Введите сумму" min="100" step="100">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="bonus-info">
+                        <i class="fas fa-gift"></i>
+                        <span>Вы получите: <span id="stars-receive">0</span> монет</span>
+                    </div>
+                </div>
+                
+                <div class="deposit-tab-content" id="ton-tab">
+                    <div class="deposit-input-group">
+                        <label for="ton-amount">Сумма в TON</label>
+                        <div class="input-with-icon">
+                            <input type="number" id="ton-amount" placeholder="Введите сумму" min="0.1" step="0.1">
+                            <i class="fab fa-telegram"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="bonus-info highlighted">
+                        <i class="fas fa-bolt"></i>
+                        <span>Бонус +20%: <span id="ton-bonus">0</span> монет</span>
+                    </div>
+                    
+                    <div class="bonus-info">
+                        <i class="fas fa-gift"></i>
+                        <span>Вы получите: <span id="ton-receive">0</span> монет</span>
+                    </div>
+                    <!-- Кнопка оплаты через TonConnect -->
+                    <button class="tonconnect-btn" id="tonconnect-btn">
+                        <img src="https://ton.org/favicon.ico" style="width:20px;vertical-align:middle;margin-right:8px;">
+                        Оплатить через TonConnect
+                    </button>
+                </div>
+                
+                <!-- Промокод -->
+                <div class="promo-input-container">
+                    <div class="promo-input-group">
+                        <input type="text" id="deposit-promo" placeholder="Введите промокод">
+                        <button class="apply-promo-btn" id="apply-promo-btn">
+                            <i class="fas fa-check"></i> Применить
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Итоговая информация -->
+                <div class="deposit-summary">
+                    <div class="summary-item">
+                        <span>Сумма:</span>
+                        <span id="summary-amount">0 монет</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Бонус:</span>
+                        <span id="summary-bonus">0 монет</span>
+                    </div>
+                    <div class="summary-item total">
+                        <span>Итого:</span>
+                        <span id="summary-total">0 монет</span>
+                    </div>
+                </div>
+                
+                <!-- Кнопка подтверждения -->
+                <button class="deposit-btn" id="confirm-deposit-btn">
+                    <i class="fas fa-arrow-right"></i> Перейти к оплате
+                </button>
+                
+                <div class="deposit-footer">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Безопасные платежи через Telegram</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно предмета -->
+    <div class="modal" id="item-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="item-modal-title">Название предмета</h2>
+                <button class="close-modal" id="close-item-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="item-image-container">
+                    <img src="" alt="Предмет" id="item-modal-image">
+                    <div class="item-rarity" id="item-modal-rarity">Обычный</div>
+                </div>
+                <div class="item-info">
+                    <p id="item-modal-description">Описание предмета</p>
+                    <div class="item-price">
+                        <span id="item-modal-price">100</span> <i class="fas fa-coins"></i>
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <button class="sell-item-btn" id="sell-item-btn">Продать</button>
+                    <button class="withdraw-item-btn" id="withdraw-item-btn">Вывести</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно информации о шансах -->
+    <div class="modal" id="chance-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Шансы выпадения</h2>
+                <button class="close-modal" id="close-chance-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="chance-info-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно создания промокода -->
+    <!-- В index.html -->
+    <div class="modal" id="create-promo-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Создать промокод</h2>
+                <button class="close-modal" id="close-create-promo-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <input type="text" 
+                        id="promo-code-input" 
+                        placeholder="Введите ваш промокод"
+                        maxlength="12"
+                        class="promo-input">
+                    <button class="save-promo-btn" id="save-promo-btn">
+                        <i class="fas fa-save"></i> Сохранить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Уведомление о сохранении -->
+    <div class="save-notification" id="save-notification">
+        Промокод успешно сохранен!
+    </div>
+
+    <div class="custom-notification" id="upgrade-notification">Coming soon</div>
+
+</body>
+</html>
