@@ -3365,3 +3365,24 @@ body {
         opacity: 1;
     }
 }
+
+.tonconnect-btn {
+    width: 100%;
+    background: linear-gradient(90deg, #0098ea, #00f2c3);
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-top: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.2s;
+}
+.tonconnect-btn:hover {
+    background: linear-gradient(90deg, #00bfff, #00e6b8);
+}

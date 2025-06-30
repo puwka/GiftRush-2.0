@@ -862,6 +862,43 @@ function initButtons() {
         confirmDepositBtn.addEventListener('click', processDeposit);
     }
     
+    // TonConnect TON оплата
+    const tonConnectBtn = document.getElementById('tonconnect-btn');
+    if (tonConnectBtn) {
+        tonConnectBtn.addEventListener('click', async () => {
+            const tonAmount = parseFloat(document.getElementById('ton-amount').value);
+            if (!tonAmount || tonAmount <= 0) {
+                showNotification('Введите сумму в TON');
+                return;
+            }
+            // 1 TON = 1e9 nanoTON
+            const nanoTonAmount = Math.floor(tonAmount * 1e9);
+            // Инициализация TonConnect
+            const tonConnect = new window.TonConnectSDK.TonConnect({
+                manifestUrl: 'https://gift-rush-2-0.vercel.app/tonconnect-manifest.json' // TODO: замените на ваш manifestUrl
+            });
+            // Подключение кошелька (если не подключен)
+            if (!tonConnect.account) {
+                await tonConnect.connectWallet();
+            }
+            // Адрес для получения TON
+            const destination = 'UQAthLzScLE9Ks-MhL1oZk2AnMqcs02JEdDTGypNnt-GH6jD'; // TODO: замените на ваш TON-адрес
+            // Создание транзакции
+            const tx = {
+                to: destination,
+                value: nanoTonAmount.toString(),
+                // text: 'GiftRush пополнение', // можно добавить комментарий
+            };
+            try {
+                await tonConnect.sendTransaction(tx);
+                showNotification('Платеж отправлен! Ожидаем подтверждения...');
+                // TODO: Реализуйте серверную проверку поступления TON и начисление монет пользователю
+            } catch (e) {
+                showNotification('Платеж отменён или произошла ошибка');
+            }
+        });
+    }
+    
     // Кнопка копирования реферальной ссылки
     const copyLinkBtn = document.getElementById('copy-link-btn');
     if (copyLinkBtn) {

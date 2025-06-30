@@ -596,6 +596,11 @@
                         <i class="fas fa-gift"></i>
                         <span>Вы получите: <span id="ton-receive">0</span> монет</span>
                     </div>
+                    <!-- Кнопка оплаты через TonConnect -->
+                    <button class="tonconnect-btn" id="tonconnect-btn">
+                        <img src="https://ton.org/favicon.ico" style="width:20px;vertical-align:middle;margin-right:8px;">
+                        Оплатить через TonConnect
+                    </button>
                 </div>
                 
                 <!-- Промокод -->
@@ -711,6 +716,7 @@
         import supabase from './js/supabase.js';
         window.supabase = supabase; // Делаем supabase доступным глобально
     </script>
+    <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect.umd.js"></script>
     <script type="module" src="js/app.js"></script>
 </body>
 </html>
