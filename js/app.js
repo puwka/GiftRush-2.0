@@ -12,6 +12,9 @@ let userBalance = 0;
 let inventoryItems = [];
 let casesData = [];
 
+// Удалить все import/export и инициализировать supabase глобально
+window.supabase = window.supabase || supabase;
+
 // Инициализация приложения
 // Обновите код в app.js (в начале функции DOMContentLoaded)
 document.addEventListener('DOMContentLoaded', async () => {
