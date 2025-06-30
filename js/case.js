@@ -361,57 +361,121 @@ function toggleDemoMode() {
     }
 }
 
-// Функция для открытия кейса
+// Определение выигрышного предмета по шансам
+function pickWinningItem() {
+    const totalChance = caseItems.reduce((sum, item) => sum + item.chance, 0);
+    let rand = Math.random() * totalChance;
+    for (const item of caseItems) {
+        if (rand < item.chance) return item;
+        rand -= item.chance;
+    }
+    return caseItems[0];
+}
+
+// Генерация массива предметов для рулетки (выигрышный по центру)
+function generateRouletteItems(winningItem) {
+    const items = [];
+    const preCount = 12; // до выигрыша
+    const postCount = 12; // после выигрыша
+    for (let i = 0; i < preCount; i++) {
+        items.push(caseItems[Math.floor(Math.random() * caseItems.length)]);
+    }
+    items.push(winningItem); // центр
+    for (let i = 0; i < postCount; i++) {
+        items.push(caseItems[Math.floor(Math.random() * caseItems.length)]);
+    }
+    return items;
+}
+
+// Заполнение рулетки предметами
+function fillRouletteWithItems(items) {
+    const roulette = document.getElementById('roulette-wheel');
+    roulette.innerHTML = '';
+    items.forEach((item, idx) => {
+        const el = document.createElement('div');
+        el.className = 'roulette-item';
+        el.innerHTML = `
+            <div class="roulette-icon" style="box-shadow: 0 0 16px 2px ${getRarityColor(item.rarity)}33; border: 2px solid ${getRarityColor(item.rarity)}; background: linear-gradient(135deg, ${getRarityColor(item.rarity)}22, transparent);">
+                <img src="${item.image_url}" alt="${item.name}" style="width: 48px; height: 48px; object-fit: contain; filter: drop-shadow(0 2px 6px ${getRarityColor(item.rarity)}99);">
+            </div>
+            <div class="roulette-value" style="color: ${getRarityColor(item.rarity)}; font-weight: 600;">${item.name}</div>
+        `;
+        roulette.appendChild(el);
+    });
+}
+
+// Цвета для редкостей
+function getRarityColor(rarity) {
+    const colors = {
+        'common': '#95a5a6',
+        'uncommon': '#2ecc71',
+        'rare': '#3498db',
+        'epic': '#9b59b6',
+        'legendary': '#f39c12'
+    };
+    return colors[rarity] || '#fff';
+}
+
+// Анимация рулетки до выигрышного предмета
+function animateRouletteToWin(winningIndex) {
+    const roulette = document.getElementById('roulette-wheel');
+    const itemWidth = 150; // px, как в css
+    const container = document.getElementById('roulette-container');
+    const visibleWidth = container.offsetWidth || 300;
+    const offset = (winningIndex * itemWidth) - (visibleWidth / 2) + (itemWidth / 2);
+    roulette.style.transition = 'transform 4.2s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
+    roulette.style.transform = `translateX(-${offset}px)`;
+}
+
+// --- ОБНОВЛЕННАЯ ФУНКЦИЯ ОТКРЫТИЯ КЕЙСА ---
 async function openCase() {
     if (!currentUser || !caseData) return;
-    
     const openBtn = document.getElementById('open-case-btn');
     const totalPrice = caseData.price * selectedCount;
     const isDemo = document.getElementById('demo-toggle').classList.contains('active');
-    
-    // Проверяем баланс (если не демо-режим)
     if (!isDemo && userBalance < totalPrice) {
         showNotification('Недостаточно средств');
         return;
     }
-    
     try {
-        // Блокируем кнопку
         openBtn.disabled = true;
-        
-        // Добавляем класс открытия для анимации
         document.querySelector('.case-main').classList.add('case-opening');
-        
-        // Скрываем элементы
         document.getElementById('case-preview').classList.add('hidden');
         document.getElementById('open-options').classList.add('hidden');
         openBtn.classList.add('hidden');
-        
-        // Показываем статус обработки
         document.getElementById('processing-status').classList.add('visible');
-        
         // Через 0.5 секунды показываем рулетку
         setTimeout(() => {
             document.getElementById('processing-status').classList.remove('visible');
-            
             const rouletteContainer = document.getElementById('roulette-container');
             rouletteContainer.classList.add('visible');
-            
-            // Если не демо-режим, списываем средства
+            // --- ВЫБОР ВЫИГРЫША ---
+            wonItems = [];
+            for (let i = 0; i < selectedCount; i++) {
+                wonItems.push(pickWinningItem());
+            }
+            // --- РУЛЕТКА ---
+            const rouletteItems = generateRouletteItems(wonItems[0]);
+            fillRouletteWithItems(rouletteItems);
+            // Сброс позиции
+            const roulette = document.getElementById('roulette-wheel');
+            roulette.style.transition = 'none';
+            roulette.style.transform = 'translateX(0)';
+            // Анимация
+            setTimeout(() => {
+                animateRouletteToWin(12);
+            }, 100);
+            setTimeout(() => {
+                highlightWinnerInRoulette();
+            }, 4200);
+            setTimeout(() => {
+                showResult(wonItems[0]);
+            }, 4400);
+            // Списание баланса (если не демо)
             if (!isDemo) {
                 deductBalance(totalPrice);
             }
-            
-            // Определяем выигранные предметы
-            wonItems = [];
-            for (let i = 0; i < selectedCount; i++) {
-                wonItems.push(getRandomItem());
-            }
-            
-            // Запускаем анимацию рулетки
-            startRouletteAnimation();
         }, 500);
-        
     } catch (error) {
         console.error('Error opening case:', error);
         showNotification('Ошибка при открытии кейса');
@@ -683,5 +747,13 @@ function showNotification(message) {
     } else {
         // Fallback для браузера
         alert(message);
+    }
+}
+
+// --- ДОБАВЛЯЕМ ВЫДЕЛЕНИЕ ВЫИГРЫШНОГО ПРЕДМЕТА ПОСЛЕ АНИМАЦИИ ---
+function highlightWinnerInRoulette() {
+    const items = document.querySelectorAll('.roulette-item');
+    if (items[12]) {
+        items[12].classList.add('winner');
     }
 }
