@@ -874,7 +874,7 @@ function initButtons() {
             // 1 TON = 1e9 nanoTON
             const nanoTonAmount = Math.floor(tonAmount * 1e9);
             // Инициализация TonConnect
-            const tonConnect = new window.TonConnect({
+            const tonConnect = new window.TonConnectSDK.TonConnect({
                 manifestUrl: 'https://gift-rush-2-0.vercel.app/tonconnect-manifest.json'
             });
             // Подключение кошелька (если не подключен)
